@@ -102,7 +102,9 @@ The REST API consists of **28 endpoints** organised into seven functional areas.
 
 The project includes a Continuous Integration and Continuous Deployment (CI/CD) pipeline to ensure code quality and reliable releases.
 
-A screenshot of the CI/CD pipeline is available in the `docs` folder.
+A screenshot of the CI/CD :
+
+<img width="1920" height="1080" alt="Screenshot 2026-09-04 132215" src="https://github.com/user-attachments/assets/79aa6d90-45da-44c3-b951-83985e86a122" />
 
 ---
 
