@@ -167,7 +167,7 @@ VALUES
 (1, 128, '03:28:15'),
 (3, 341, '04:15:42')
 
---displau
+--display
 
 SELECT * FROM Users
 SELECT * FROM Event_Organiser
