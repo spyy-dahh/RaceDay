@@ -1,7 +1,11 @@
-﻿namespace RaceDay.Api.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+
+namespace RaceDay.Api.Models
 {
     public class User
     {
+        [Key]
         public int UserId { get; set; }
         public required string UserName { get; set; }
         public required string EmailAddress { get; set; }
