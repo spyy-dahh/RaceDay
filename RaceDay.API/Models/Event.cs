@@ -1,7 +1,10 @@
-﻿namespace RaceDay.Api.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace RaceDay.Api.Models
 {
     public class Event
     {
+        [Key]
         public int EventId { get; set; }
         public int OrganiserId { get; set; }
         public required string EventName { get; set; }
