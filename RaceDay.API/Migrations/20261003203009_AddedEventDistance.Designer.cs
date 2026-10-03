@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RaceDay.API.Data;
 
@@ -11,9 +12,11 @@ using RaceDay.API.Data;
 namespace RaceDay.API.Migrations
 {
     [DbContext(typeof(RaceDayDbContext))]
-    partial class RaceDayDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261003203009_AddedEventDistance")]
+    partial class AddedEventDistance
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
