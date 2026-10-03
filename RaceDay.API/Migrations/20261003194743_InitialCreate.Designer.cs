@@ -12,7 +12,7 @@ using RaceDay.API.Data;
 namespace RaceDay.API.Migrations
 {
     [DbContext(typeof(RaceDayDbContext))]
-    [Migration("20261003191657_InitialCreate")]
+    [Migration("20261003194743_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -331,7 +331,7 @@ namespace RaceDay.API.Migrations
                     b.HasOne("RaceDay.Api.Models.EventOrganiser", null)
                         .WithMany()
                         .HasForeignKey("OrganiserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
                         .HasConstraintName("FK_Event_Organiser");
                 });
@@ -341,7 +341,7 @@ namespace RaceDay.API.Migrations
                     b.HasOne("RaceDay.Api.Models.Event", null)
                         .WithMany()
                         .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
                         .HasConstraintName("FK_Category_Event");
                 });
@@ -351,21 +351,21 @@ namespace RaceDay.API.Migrations
                     b.HasOne("RaceDay.Api.Models.EventCategory", null)
                         .WithMany()
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
                         .HasConstraintName("FK_Enrolment_Category");
 
                     b.HasOne("RaceDay.Api.Models.Event", null)
                         .WithMany()
                         .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
                         .HasConstraintName("FK_Enrolment_Event");
 
                     b.HasOne("RaceDay.Api.Models.Participant", null)
                         .WithMany()
                         .HasForeignKey("ParticipantId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
                         .HasConstraintName("FK_Enrolment_Participant");
                 });
@@ -375,7 +375,7 @@ namespace RaceDay.API.Migrations
                     b.HasOne("RaceDay.Api.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
                         .HasConstraintName("FK_Organiser_User");
                 });
@@ -385,7 +385,7 @@ namespace RaceDay.API.Migrations
                     b.HasOne("RaceDay.Api.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
                         .HasConstraintName("FK_Participant_User");
                 });
@@ -395,7 +395,7 @@ namespace RaceDay.API.Migrations
                     b.HasOne("RaceDay.Api.Models.EventEnrolment", null)
                         .WithMany()
                         .HasForeignKey("EnrolmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
                         .HasConstraintName("FK_Result_Enrolment");
                 });
@@ -405,7 +405,7 @@ namespace RaceDay.API.Migrations
                     b.HasOne("RaceDay.Api.Models.Event", null)
                         .WithMany()
                         .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired()
                         .HasConstraintName("FK_Route_Event");
                 });

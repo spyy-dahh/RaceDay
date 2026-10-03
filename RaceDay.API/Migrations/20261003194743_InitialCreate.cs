@@ -42,8 +42,7 @@ namespace RaceDay.API.Migrations
                         name: "FK_Organiser_User",
                         column: x => x.userID,
                         principalTable: "Users",
-                        principalColumn: "userID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "userID");
                 });
 
             migrationBuilder.CreateTable(
@@ -61,8 +60,7 @@ namespace RaceDay.API.Migrations
                         name: "FK_Participant_User",
                         column: x => x.userID,
                         principalTable: "Users",
-                        principalColumn: "userID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "userID");
                 });
 
             migrationBuilder.CreateTable(
@@ -86,8 +84,7 @@ namespace RaceDay.API.Migrations
                         name: "FK_Event_Organiser",
                         column: x => x.organiserID,
                         principalTable: "Event_Organiser",
-                        principalColumn: "organiserID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "organiserID");
                 });
 
             migrationBuilder.CreateTable(
@@ -108,8 +105,7 @@ namespace RaceDay.API.Migrations
                         name: "FK_Category_Event",
                         column: x => x.eventID,
                         principalTable: "Event",
-                        principalColumn: "eventID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "eventID");
                 });
 
             migrationBuilder.CreateTable(
@@ -130,8 +126,7 @@ namespace RaceDay.API.Migrations
                         name: "FK_Route_Event",
                         column: x => x.eventID,
                         principalTable: "Event",
-                        principalColumn: "eventID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "eventID");
                 });
 
             migrationBuilder.CreateTable(
@@ -154,20 +149,17 @@ namespace RaceDay.API.Migrations
                         name: "FK_Enrolment_Category",
                         column: x => x.categoryID,
                         principalTable: "Event_Categories",
-                        principalColumn: "categoryID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "categoryID");
                     table.ForeignKey(
                         name: "FK_Enrolment_Event",
                         column: x => x.eventID,
                         principalTable: "Event",
-                        principalColumn: "eventID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "eventID");
                     table.ForeignKey(
                         name: "FK_Enrolment_Participant",
                         column: x => x.participantID,
                         principalTable: "Participant",
-                        principalColumn: "participantID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "participantID");
                 });
 
             migrationBuilder.CreateTable(
@@ -189,8 +181,7 @@ namespace RaceDay.API.Migrations
                         name: "FK_Result_Enrolment",
                         column: x => x.enrolmentID,
                         principalTable: "Event_Enrolment",
-                        principalColumn: "enrolmentID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "enrolmentID");
                 });
 
             migrationBuilder.CreateIndex(
