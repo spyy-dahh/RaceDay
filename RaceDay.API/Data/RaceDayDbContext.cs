@@ -114,6 +114,7 @@ namespace RaceDay.API.Data
 
 
             // Event
+            // Event
             modelBuilder.Entity<Event>(eventEntity =>
             {
                 eventEntity.HasKey(eventEntity => eventEntity.EventId);
@@ -143,6 +144,11 @@ namespace RaceDay.API.Data
                 eventEntity.Property(eventEntity => eventEntity.Location)
                     .HasColumnName("location")
                     .HasMaxLength(100)
+                    .IsRequired();
+
+                eventEntity.Property(eventEntity => eventEntity.Distance)
+                    .HasColumnName("distance")
+                    .HasPrecision(5, 2)
                     .IsRequired();
 
                 eventEntity.Property(eventEntity => eventEntity.EventType)

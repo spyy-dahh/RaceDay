@@ -36,6 +36,11 @@ namespace RaceDay.API.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("description");
 
+                    b.Property<decimal>("Distance")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)")
+                        .HasColumnName("distance");
+
                     b.Property<DateTime>("EventDate")
                         .HasColumnType("date")
                         .HasColumnName("eventDate");
