@@ -10,7 +10,7 @@ CREATE TABLE Users (
     userName VARCHAR(100) NOT NULL,
     emailAddress VARCHAR(100) NOT NULL,
     contactNumber VARCHAR(10) NOT NULL,
-    [password] VARCHAR(255) NOT NULL, --wrapped in [] to avoid potential keyword problems
+    password VARCHAR(255) NOT NULL,
     CONSTRAINT UQ_Users_EmailAddress UNIQUE (emailAddress)
 )
 
@@ -39,9 +39,9 @@ CREATE TABLE Event (
     eventID INT IDENTITY(1,1) PRIMARY KEY,
     organiserID INT NOT NULL,
     eventName VARCHAR(100) NOT NULL,
-    [description] VARCHAR(255),
+    description VARCHAR(255),
     eventDate DATE NOT NULL,
-    [location] VARCHAR(100) NOT NULL,
+    location VARCHAR(100) NOT NULL,
     eventType VARCHAR(20) NOT NULL,
     CONSTRAINT CK_Event_EventType CHECK (eventType IN ('Run', 'Walk', 'Cycle')),
     CONSTRAINT FK_Event_Organiser FOREIGN KEY (organiserID) REFERENCES Event_Organiser(organiserID)
@@ -81,7 +81,7 @@ CREATE TABLE Event_Enrolment (
     categoryID INT NOT NULL,
     participantID INT NOT NULL,
     enrolmentDate DATE NOT NULL DEFAULT CAST(GETDATE() AS DATE),
-    [status] VARCHAR(20) NOT NULL DEFAULT 'Registered',
+    status VARCHAR(20) NOT NULL DEFAULT 'Registered',
     CONSTRAINT CK_Enrolment_Status CHECK (Status IN ('Registered', 'Cancelled')),
     CONSTRAINT FK_Enrolment_Event FOREIGN KEY (eventID) REFERENCES Event(eventID),
     CONSTRAINT FK_Enrolment_Category FOREIGN KEY (categoryID) REFERENCES Event_Categories(categoryID),
@@ -105,7 +105,7 @@ CREATE TABLE Results (
 
 --inserts
 
-INSERT INTO Users(userName, emailAddress, contactNumber, [password])
+INSERT INTO Users(userName, emailAddress, contactNumber, password)
 VALUES
 ('Sarah Mokoena', 'sarah.mokoena@gmail.com', '0825652391', 'Mokoena#4821'),
 ('Thabo Ndlovu', 'thabo.ndlovu@gmail.com', '0832459045', 'Thabo$7319'),
@@ -128,7 +128,7 @@ VALUES
 
 
 
-INSERT INTO Event(organiserID, eventName, [description], eventDate, [location], eventType)
+INSERT INTO Event(organiserID, eventName, description, eventDate, location, eventType)
 VALUES
 (1, 'Soweto Marathon', 'Annual road marathon through Soweto', '2027-11-07', 'Johannesburg', 'Run'),
 (1, 'Cape Town Cycle Tour', 'Iconic cycling event around Cape Town', '2027-03-14', 'Cape Town', 'Cycle'),
