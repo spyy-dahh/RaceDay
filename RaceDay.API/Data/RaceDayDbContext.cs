@@ -81,6 +81,7 @@ namespace RaceDay.API.Data
                 eventOrganiser.HasOne<User>()
                     .WithMany()
                     .HasForeignKey(eventOrganiser => eventOrganiser.UserId)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_Organiser_User");
             });
 
@@ -107,6 +108,7 @@ namespace RaceDay.API.Data
                 participant.HasOne<User>()
                     .WithMany()
                     .HasForeignKey(participant => participant.UserId)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_Participant_User");
             });
 
@@ -114,8 +116,6 @@ namespace RaceDay.API.Data
             // Event
             modelBuilder.Entity<Event>(eventEntity =>
             {
-                eventEntity.ToTable("Event");
-
                 eventEntity.HasKey(eventEntity => eventEntity.EventId);
 
                 eventEntity.Property(eventEntity => eventEntity.EventId)
@@ -150,13 +150,17 @@ namespace RaceDay.API.Data
                     .HasMaxLength(20)
                     .IsRequired();
 
-                eventEntity.HasCheckConstraint(
-                    "CK_Event_EventType",
-                    "[eventType] IN ('Run', 'Walk', 'Cycle')");
+                eventEntity.ToTable("Event", eventTable =>
+                {
+                    eventTable.HasCheckConstraint(
+                        "CK_Event_EventType",
+                        "[eventType] IN ('Run', 'Walk', 'Cycle')");
+                });
 
                 eventEntity.HasOne<EventOrganiser>()
                     .WithMany()
                     .HasForeignKey(eventEntity => eventEntity.OrganiserId)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_Event_Organiser");
             });
 
@@ -200,6 +204,7 @@ namespace RaceDay.API.Data
                 eventCategory.HasOne<Event>()
                     .WithMany()
                     .HasForeignKey(eventCategory => eventCategory.EventId)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_Category_Event");
             });
 
@@ -239,6 +244,7 @@ namespace RaceDay.API.Data
                 route.HasOne<Event>()
                     .WithMany()
                     .HasForeignKey(route => route.EventId)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_Route_Event");
             });
 
@@ -246,8 +252,6 @@ namespace RaceDay.API.Data
             // Event Enrolment
             modelBuilder.Entity<EventEnrolment>(eventEnrolment =>
             {
-                eventEnrolment.ToTable("Event_Enrolment");
-
                 eventEnrolment.HasKey(eventEnrolment => eventEnrolment.EnrolmentId);
 
                 eventEnrolment.Property(eventEnrolment => eventEnrolment.EnrolmentId)
@@ -278,9 +282,12 @@ namespace RaceDay.API.Data
                     .HasDefaultValue("Registered")
                     .IsRequired();
 
-                eventEnrolment.HasCheckConstraint(
-                    "CK_Enrolment_Status",
-                    "[status] IN ('Registered', 'Cancelled')");
+                eventEnrolment.ToTable("Event_Enrolment", eventEnrolmentTable =>
+                {
+                    eventEnrolmentTable.HasCheckConstraint(
+                        "CK_Enrolment_Status",
+                        "[status] IN ('Registered', 'Cancelled')");
+                });
 
                 eventEnrolment.HasIndex(eventEnrolment => new
                 {
@@ -294,16 +301,19 @@ namespace RaceDay.API.Data
                 eventEnrolment.HasOne<Event>()
                     .WithMany()
                     .HasForeignKey(eventEnrolment => eventEnrolment.EventId)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_Enrolment_Event");
 
                 eventEnrolment.HasOne<EventCategory>()
                     .WithMany()
                     .HasForeignKey(eventEnrolment => eventEnrolment.CategoryId)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_Enrolment_Category");
 
                 eventEnrolment.HasOne<Participant>()
                     .WithMany()
                     .HasForeignKey(eventEnrolment => eventEnrolment.ParticipantId)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_Enrolment_Participant");
             });
 
@@ -311,8 +321,6 @@ namespace RaceDay.API.Data
             // Results
             modelBuilder.Entity<Result>(result =>
             {
-                result.ToTable("Results");
-
                 result.HasKey(result => result.ResultId);
 
                 result.Property(result => result.ResultId)
@@ -338,9 +346,12 @@ namespace RaceDay.API.Data
                     .HasDefaultValueSql("CAST(GETDATE() AS DATE)")
                     .IsRequired();
 
-                result.HasCheckConstraint(
-                    "CK_Result_Position",
-                    "[position] > 0");
+                result.ToTable("Results", resultTable =>
+                {
+                    resultTable.HasCheckConstraint(
+                        "CK_Result_Position",
+                        "[position] > 0");
+                });
 
                 result.HasIndex(result => result.EnrolmentId)
                     .IsUnique()
@@ -349,6 +360,7 @@ namespace RaceDay.API.Data
                 result.HasOne<EventEnrolment>()
                     .WithMany()
                     .HasForeignKey(result => result.EnrolmentId)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_Result_Enrolment");
             });
         }
