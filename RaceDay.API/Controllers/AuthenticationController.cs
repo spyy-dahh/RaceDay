@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using RaceDay.API.Data;
 using RaceDay.Api.Models;
 using RaceDay.Api.Models.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RaceDay.Api.Controllers
 {
@@ -194,5 +195,17 @@ namespace RaceDay.Api.Controllers
                 token = tokenString
             });
         }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            return Ok(new
+            {
+                message = "Logged out successfully."
+            });
+        }
+
+
     }
 }
