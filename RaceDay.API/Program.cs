@@ -80,3 +80,6 @@ app.UseAuthorization(); //"what can you do after youve been identified"
 app.MapControllers();
 
 app.Run();
+
+
+public partial class Program { } //for the test classes
