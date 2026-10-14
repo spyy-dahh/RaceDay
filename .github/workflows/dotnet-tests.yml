@@ -10,84 +10,25 @@ on:
 
 permissions:
   contents: read
-  checks: write
 
 jobs:
   build-and-test:
-    name: "Build and Test (OS: ${{ matrix.os }})"
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        dotnet: ['8.0.x']
-      fail-fast: false
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Setup .NET
+      - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ matrix.dotnet }}
-
-      - name: Cache NuGet packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.nuget/packages
-            ~/.local/share/NuGet
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
+          dotnet-version: '8.0.x'
 
       - name: Restore dependencies
         run: dotnet restore RaceDay.Api.Tests/RaceDay.Api.Tests.csproj
 
-      - name: Build solution (Release)
+      - name: Build solution
         run: dotnet build RaceDay.Api.Tests/RaceDay.Api.Tests.csproj --configuration Release --no-restore
 
-      - name: Run tests and collect results
-        run: |
-          dotnet test RaceDay.Api.Tests/RaceDay.Api.Tests.csproj \
-            --configuration Release \
-            --no-build \
-            --no-restore \
-            --logger "trx;LogFileName=TestResults.trx" \
-            --results-directory TestResults \
-            --collect:"XPlat Code Coverage"
-
-      - name: Restore dependencies
-        shell: bash
-        run: dotnet restore "${{ steps.find_sln.outputs.sln }}"
-
-      - name: Build solution (Release)
-        shell: bash
-        run: dotnet build "${{ steps.find_sln.outputs.sln }}" --configuration Release --no-restore
-
-      - name: Run tests and collect results
-        shell: bash
-        run: |
-          mkdir -p TestResults
-          # Run tests with TRX logger and collect code coverage (XPlat Code Coverage collector)
-          dotnet test "${{ steps.find_sln.outputs.sln }}" \
-            --configuration Release \
-            --no-build \
-            --no-restore \
-            --logger "trx;LogFileName=TestResults.trx" \
-            --results-directory TestResults \
-            --collect:"XPlat Code Coverage"
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results-${{ matrix.os }}
-          path: TestResults/**
-
-      - name: Show summary (optional)
-        if: always()
-        shell: bash
-        run: |
-          echo "Uploaded test artifacts. To inspect locally, download the artifacts from the workflow run."
+      - name: Run tests
+        run: dotnet test RaceDay.Api.Tests/RaceDay.Api.Tests.csproj --configuration Release --no-build --no-restore
