@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   build-and-test:
-    name: Build and Test (OS: ${{ matrix.os }})
+    name: "Build and Test (OS: ${{ matrix.os }})"
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
