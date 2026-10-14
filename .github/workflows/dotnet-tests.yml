@@ -1,28 +1,90 @@
-
-name: RaceDay Build and Tests
+name: CI — Build and Test
 
 on:
   push:
+    branches:
+      - '**'
   pull_request:
+    branches:
+      - '**'
+
+permissions:
+  contents: read
+  checks: write
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    name: Build and Test (OS: ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        dotnet: ['8.0.x']
+      fail-fast: false
 
     steps:
-      - name: Check out repository
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Set up .NET
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: ${{ matrix.dotnet }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.nuget/packages
+            ~/.local/share/NuGet
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Find solution file
+        id: find_sln
+        shell: bash
+        run: |
+          echo "Searching for solution file (*.sln or *.slnx)..."
+          sln=$(ls *.sln 2>/dev/null || ls *.slnx 2>/dev/null || true)
+          if [ -z "${sln}" ]; then
+            echo "ERROR: No solution file (*.sln or *.slnx) found in repository root." >&2
+            exit 1
+          fi
+          echo "Found solution: $sln"
+          echo "sln=$sln" >> $GITHUB_OUTPUT
 
       - name: Restore dependencies
-        run: dotnet restore RaceDay.slnx
+        shell: bash
+        run: dotnet restore "${{ steps.find_sln.outputs.sln }}"
 
-      - name: Build solution
-        run: dotnet build RaceDay.slnx --configuration Release --no-restore
+      - name: Build solution (Release)
+        shell: bash
+        run: dotnet build "${{ steps.find_sln.outputs.sln }}" --configuration Release --no-restore
 
-      - name: Run tests
-        run: dotnet test RaceDay.slnx --configuration Release --no-build --no-restore
+      - name: Run tests and collect results
+        shell: bash
+        run: |
+          mkdir -p TestResults
+          # Run tests with TRX logger and collect code coverage (XPlat Code Coverage collector)
+          dotnet test "${{ steps.find_sln.outputs.sln }}" \
+            --configuration Release \
+            --no-build \
+            --no-restore \
+            --logger "trx;LogFileName=TestResults.trx" \
+            --results-directory TestResults \
+            --collect:"XPlat Code Coverage"
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}
+          path: TestResults/**
+
+      - name: Show summary (optional)
+        if: always()
+        shell: bash
+        run: |
+          echo "Uploaded test artifacts. To inspect locally, download the artifacts from the workflow run."
