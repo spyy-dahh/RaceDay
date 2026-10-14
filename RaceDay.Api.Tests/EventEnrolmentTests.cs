@@ -222,6 +222,21 @@ namespace RaceDay.Api.Tests
 
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
+
+
+        [Fact]
+        public async Task EnrolInEvent_WithoutToken_ReturnsUnauthorized()
+        {
+            // Arrange: Create a client without logging in.
+            using var client = _factory.CreateClient();
+
+            // Act: Try to enrol without an authentication token.
+            var response = await client.PostAsync("/api/events/1/enrolments", null);
+
+            // Assert: The API should reject the request.
+            Assert.Equal(System.Net.HttpStatusCode.Unauthorized,response.StatusCode);
+        }
+
     }
 }
 
