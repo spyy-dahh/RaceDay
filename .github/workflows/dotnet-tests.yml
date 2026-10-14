@@ -43,18 +43,21 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Find solution file
-        id: find_sln
-        shell: bash
+      - name: Restore dependencies
+        run: dotnet restore RaceDay.Api.Tests/RaceDay.Api.Tests.csproj
+
+      - name: Build solution (Release)
+        run: dotnet build RaceDay.Api.Tests/RaceDay.Api.Tests.csproj --configuration Release --no-restore
+
+      - name: Run tests and collect results
         run: |
-          echo "Searching for solution file (*.sln or *.slnx)..."
-          sln=$(ls *.sln 2>/dev/null || ls *.slnx 2>/dev/null || true)
-          if [ -z "${sln}" ]; then
-            echo "ERROR: No solution file (*.sln or *.slnx) found in repository root." >&2
-            exit 1
-          fi
-          echo "Found solution: $sln"
-          echo "sln=$sln" >> $GITHUB_OUTPUT
+          dotnet test RaceDay.Api.Tests/RaceDay.Api.Tests.csproj \
+            --configuration Release \
+            --no-build \
+            --no-restore \
+            --logger "trx;LogFileName=TestResults.trx" \
+            --results-directory TestResults \
+            --collect:"XPlat Code Coverage"
 
       - name: Restore dependencies
         shell: bash
