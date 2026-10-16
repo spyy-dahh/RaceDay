@@ -192,7 +192,7 @@ The REST API consists of **28 endpoints** organised into seven functional areas.
 **Total Endpoints:** 28
 
 ---
-## CI/CD Pipeline
+## CI/CD Pipeline PART 1
 
 The project includes a Continuous Integration and Continuous Deployment (CI/CD) pipeline to ensure code quality and reliable releases.
 
@@ -200,10 +200,17 @@ A screenshot of the CI/CD :
 
 <img width="1920" height="1080" alt="Screenshot 2026-09-04 132215" src="https://github.com/user-attachments/assets/79aa6d90-45da-44c3-b951-83985e86a122" />
 
+## CI/CD Pipeline PART 2
+
+<img width="1920" height="1020" alt="image" src="https://github.com/user-attachments/assets/61bc8f20-a21d-4bdf-b5cd-d2b7f2140746" />
+
 ---
 
 ## Demonstration Video
 
 The project demonstration video is available through the unlisted YouTube link below.
 
+## PART 1
 **YouTube Link:** https://youtu.be/iyjOG4kLHJY
+
+## PART 2
