@@ -9,6 +9,100 @@ The system enables event organisers to create and manage races, define participa
 RaceDay streamlines the complete event lifecycle—from event creation through result recording—using role-based access control and real-time data management.
 
 ---
+## Setup and Run Instructions
+
+### Prerequisites
+
+Before running RaceDay, ensure that the following software is installed:
+
+-   Visual Studio 2022 or later with the ASP.NET and web development
+    workload.
+-   .NET 8 SDK.
+-   SQL Server Express LocalDB.
+-   Git.
+
+### 1. Clone the Repository
+
+Clone the repository from GitHub:
+
+``` bash
+git clone https://github.com/spyy-dahh/RaceDay.git
+cd RaceDay
+```
+
+Switch to the `Part2` branch if it is the branch being submitted:
+
+``` bash
+git checkout Part2
+```
+
+Alternatively, download the repository from GitHub and select the
+`Part2` branch before downloading.
+
+### 2. Configure the Database Connection
+
+RaceDay uses SQL Server LocalDB. The database connection string is
+configured in `appsettings.json` in the API project.
+
+Before running the application:
+
+1.  Ensure SQL Server LocalDB is installed.
+2.  Open `RaceDay.API/appsettings.json`.
+3.  Check that the connection string points to the intended database and
+    LocalDB instance.
+4.  Ensure that the database exists and contains the required tables and
+    data.
+
+If the database has not been created, use the project's database
+creation SQL script, if provided, or the database setup procedure
+documented in the repository.
+
+Do not commit database passwords or other sensitive credentials to
+GitHub.
+
+### 3. Restore Dependencies
+
+Open a terminal in the repository root and run:
+
+``` bash
+dotnet restore RaceDay.Api.Tests/RaceDay.Api.Tests.csproj
+```
+
+This restores the NuGet packages required by the test project and its
+referenced API project.
+
+### 4. Run the API
+
+Open the RaceDay solution in Visual Studio and set `RaceDay.API` as the
+startup project.
+
+Run the application using the Run button in Visual Studio.
+
+Alternatively, run the API from the repository root:
+
+``` bash
+dotnet run --project RaceDay.API/RaceDay.API.csproj
+```
+
+Use the application URL displayed in the terminal. If Swagger is
+enabled, open the Swagger URL to explore and test the available API
+endpoints.
+
+### 5. Run the Automated Tests
+
+From the repository root, run:
+
+``` bash
+dotnet test RaceDay.Api.Tests/RaceDay.Api.Tests.csproj
+```
+
+This command builds the required projects and executes the automated
+tests.
+
+The project also uses GitHub Actions to build and test the application
+automatically when changes are pushed to the repository.
+
+---
 
 ## User Roles
 
