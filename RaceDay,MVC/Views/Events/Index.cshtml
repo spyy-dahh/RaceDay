@@ -1,0 +1,138 @@
+﻿@model List<RaceDay.MVC.Models.EventViewModel>
+
+@{
+    ViewData["Title"] = "Upcoming Events";
+}
+
+<div class="container mt-4">
+
+    <!-- Page heading -->
+
+    <div class="mb-4">
+        <h1 class="display-5 fw-bold">Discover Events</h1>
+        <p class="text-muted">
+            Find your next running, walking or cycling challenge.
+        </p>
+    </div>
+
+    <!-- Search and filter form -->
+    <form asp-controller="Events" asp-action="Index"
+          method="get" class="card card-body mb-4 shadow-sm">
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+                <label for="searchTerm" class="form-label">
+                    Search events
+                </label>
+
+                <input type="text"
+                       id="searchTerm"
+                       name="searchTerm"
+                       value="@ViewBag.SearchTerm"
+                       class="form-control"
+                       placeholder="Enter an event name or location" />
+            </div>
+
+            <div class="col-md-4">
+                <label for="eventType" class="form-label">
+                    Event type
+                </label>
+
+                <select id="eventType" name="eventType"
+                        class="form-select">
+                    <option value="">All types</option>
+                    <option value="Run"
+                            selected="@(ViewBag.EventType as string == "Run")">
+                        Run
+                    </option>
+                    <option value="Walk"
+                            selected="@(ViewBag.EventType as string == "Walk")">
+                        Walk
+                    </option>
+                    <option value="Cycle"
+                            selected="@(ViewBag.EventType as string == "Cycle")">
+                        Cycle
+                    </option>
+                </select>
+            </div>
+
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-success w-100">
+                    Search
+                </button>
+            </div>
+
+        </div>
+
+        <div class="mt-3">
+            <a asp-controller="Events" asp-action="Index"
+               class="text-decoration-none">
+                Clear filters
+            </a>
+        </div>
+    </form>
+
+
+    <!-- Display an error if the API could not provide events -->
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-warning">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+    else if (Model.Count == 0)
+    {
+        <div class="alert alert-info">
+            No events are currently available.
+        </div>
+    }
+    else
+    {
+        <!-- Display each event as a card -->
+        <div class="row g-4">
+            @foreach (var eventItem in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm">
+
+                        <div class="card-body">
+
+                            <span class="badge bg-success mb-2">
+                                @eventItem.EventType
+                            </span>
+
+                            <h2 class="card-title h4">
+                                @eventItem.EventName
+                            </h2>
+
+                            <p class="text-muted">
+                                @eventItem.Description
+                            </p>
+
+                            <hr />
+
+                            <p>
+                                <strong>Date:</strong>
+                                @eventItem.EventDate.ToString("dd MMMM yyyy")
+                            </p>
+
+                            <p>
+                                <strong>Location:</strong>
+                                @eventItem.Location
+                            </p>
+
+                            <p>
+                                <strong>Distance:</strong>
+                                @eventItem.Distance km
+                            </p>
+
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+</div>
