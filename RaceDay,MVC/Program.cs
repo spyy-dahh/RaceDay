@@ -7,7 +7,15 @@ builder.Services.AddHttpClient("RaceDayAPI", client =>
     client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"]!);
 });
 
-
+// Allow MVC to store login information between requests.
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    // End the session after 30 minutes of inactivity.
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
@@ -23,6 +31,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseSession();
 
 app.UseAuthorization();
 

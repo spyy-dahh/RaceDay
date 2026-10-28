@@ -192,7 +192,8 @@ namespace RaceDay.Api.Controllers
             return Ok(new
             {
                 message = "Login successful.",
-                token = tokenString
+                token = tokenString,
+                role = role
             });
         }
 
