@@ -1,0 +1,86 @@
+﻿@{
+    ViewData["Title"] = "Participant Dashboard";
+}
+
+<div class="container mt-5 mb-5">
+
+    <div class="p-4 p-md-5 mb-4 bg-light rounded-3">
+        <h1 class="display-6 fw-bold">Welcome to RaceDay!</h1>
+
+        <p class="lead mb-0">
+            Discover events, track your enrolments and celebrate your results.
+        </p>
+    </div>
+
+    <h2 class="h4 mb-3">Your RaceDay</h2>
+
+    <div class="row g-4">
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="h5 card-title">Upcoming Events</h3>
+
+                    <p class="card-text">
+                        Find running, walking and cycling events to join.
+                    </p>
+
+                    <a asp-controller="Events"
+                       asp-action="Index"
+                       class="btn btn-primary">
+                        Browse Events
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="h5 card-title">My Enrolments</h3>
+
+                    <p class="card-text">
+                        Check the events you have enrolled in and their status.
+                    </p>
+
+                    <span class="badge text-bg-secondary">
+                        Coming next
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="h5 card-title">My Results</h3>
+
+                    <p class="card-text">
+                        Review your race times and finishing positions.
+                    </p>
+
+                    <span class="badge text-bg-secondary">
+                        Coming next
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="h5 card-title">My Profile</h3>
+
+                    <p class="card-text">
+                        Manage your personal details.
+                    </p>
+
+                    <span class="badge text-bg-secondary">
+                        Coming next
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

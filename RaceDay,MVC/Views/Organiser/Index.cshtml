@@ -1,0 +1,102 @@
+﻿@{
+    ViewData["Title"] = "Organiser Dashboard";
+}
+
+<div class="container mt-5 mb-5">
+
+    <div class="p-4 p-md-5 mb-4 bg-light rounded-3">
+        <h1 class="display-6 fw-bold">Organiser Dashboard</h1>
+
+        <p class="lead mb-0">
+            Manage your events and help keep RaceDay running smoothly.
+        </p>
+    </div>
+
+    <h2 class="h4 mb-3">Event Management</h2>
+
+    <div class="row g-4">
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="h5 card-title">Browse Events</h3>
+
+                    <p class="card-text">
+                        View the events currently available on RaceDay.
+                    </p>
+
+                    <a asp-controller="Events"
+                       asp-action="Index"
+                       class="btn btn-primary">
+                        View Events
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="h5 card-title">Manage My Events</h3>
+
+                    <p class="card-text">
+                        Create, update and manage the events you organise.
+                    </p>
+
+                    <span class="badge text-bg-secondary">
+                        Coming next
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="h5 card-title">Enrolments</h3>
+
+                    <p class="card-text">
+                        View participants enrolled in your events.
+                    </p>
+
+                    <span class="badge text-bg-secondary">
+                        Coming next
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="h5 card-title">Race Results</h3>
+
+                    <p class="card-text">
+                        Record and manage participants' race results.
+                    </p>
+
+                    <span class="badge text-bg-secondary">
+                        Coming next
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="h5 card-title">Categories</h3>
+
+                    <p class="card-text">
+                        Set up categories for your events.
+                    </p>
+
+                    <span class="badge text-bg-secondary">
+                        Coming next
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

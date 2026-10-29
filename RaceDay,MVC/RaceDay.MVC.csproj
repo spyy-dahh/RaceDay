@@ -7,8 +7,4 @@
     <RootNamespace>RaceDay_MVC</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Views\Organiser\" />
-  </ItemGroup>
-
 </Project>
