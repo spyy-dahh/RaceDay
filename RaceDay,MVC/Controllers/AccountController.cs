@@ -121,5 +121,19 @@ namespace RaceDay.MVC.Controllers
             return RedirectToAction("Index", "Participant");
         }
 
+
+        // Log the user out of the MVC application.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Logout()
+        {
+            // Remove the stored JWT, role and other session information.
+            HttpContext.Session.Clear();
+
+            TempData["SuccessMessage"] = "You have been logged out.";
+
+            return RedirectToAction("Login", "Account");
+        }
+
     }
 }
