@@ -130,5 +130,142 @@ namespace RaceDay.MVC.Controllers
 
             return View(events ?? new List<EventViewModel>());
         }
+
+        // Display the Edit Event form
+        [HttpGet]
+        public async Task<IActionResult> EditEvent(int id)
+        {
+            string? role = HttpContext.Session.GetString("UserRole");
+
+            if (role != "Organiser")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            string? token = HttpContext.Session.GetString("JWToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var client = _httpClientFactory.CreateClient("RaceDayAPI");
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            // Get the existing event from the API
+            var response = await client.GetAsync($"api/events/{id}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                TempData["ErrorMessage"] = "Could not find that event.";
+                return RedirectToAction("MyEvents");
+            }
+
+            var eventItem = await response.Content.ReadFromJsonAsync<EventViewModel>();
+
+            if (eventItem == null)
+            {
+                TempData["ErrorMessage"] = "Could not load the event.";
+                return RedirectToAction("MyEvents");
+            }
+
+            // Copy the existing event details into the form model
+            var model = new CreateEventViewModel
+            {
+                EventName = eventItem.EventName,
+                Description = eventItem.Description,
+                EventDate = eventItem.EventDate,
+                Location = eventItem.Location,
+                Distance = eventItem.Distance,
+                EventType = eventItem.EventType
+            };
+            ViewBag.EventId = id;
+            return View(model);
+        }
+
+        // Send updated event details to the API
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditEvent(int id, CreateEventViewModel model)
+        {
+            string? role = HttpContext.Session.GetString("UserRole");
+
+            if (role != "Organiser")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            string? token = HttpContext.Session.GetString("JWToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var client = _httpClientFactory.CreateClient("RaceDayAPI");
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            // Update the event through the API
+            var response = await client.PutAsJsonAsync($"api/events/{id}", model);
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["SuccessMessage"] = "Event updated successfully!";
+                return RedirectToAction("MyEvents");
+            }
+
+            string errorMessage = await response.Content.ReadAsStringAsync();
+
+            ModelState.AddModelError(string.Empty,"Could not update the event. " + errorMessage);
+
+            return View(model);
+        }
+
+        // Delete an event
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteEvent(int id)
+        {
+            string? role = HttpContext.Session.GetString("UserRole");
+
+            if (role != "Organiser")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            string? token = HttpContext.Session.GetString("JWToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var client = _httpClientFactory.CreateClient("RaceDayAPI");
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            // Send the delete request to the API
+            var response = await client.DeleteAsync($"api/events/{id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["SuccessMessage"] = "Event deleted successfully!";
+            }
+            else
+            {
+                string errorMessage = await response.Content.ReadAsStringAsync();
+
+                TempData["ErrorMessage"] = "Could not delete the event. " + errorMessage;
+            }
+
+            return RedirectToAction("MyEvents");
+        }
     }
 }
