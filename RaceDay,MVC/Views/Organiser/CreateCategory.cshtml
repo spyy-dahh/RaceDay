@@ -1,0 +1,54 @@
+﻿@model RaceDay.MVC.Models.CategoryViewModel
+
+@{
+    ViewData["Title"] = "Create Category";
+}
+
+<div class="container mt-5 mb-5">
+    <h1 class="fw-bold mb-4">Add Category</h1>
+
+    <form asp-action="CreateCategory"
+          asp-route-id="@ViewBag.EventId"
+          method="post">
+
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="CategoryName" class="form-label">
+                Category Name
+            </label>
+            <input asp-for="CategoryName" class="form-control"
+                   placeholder="e.g. 10 km Open" />
+            <span asp-validation-for="CategoryName"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Distance" class="form-label">
+                Distance
+            </label>
+            <input asp-for="Distance" class="form-control"
+                   placeholder="e.g. 10 km" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="AgeRange" class="form-label">
+                Age Range
+            </label>
+            <input asp-for="AgeRange" class="form-control"
+                   placeholder="e.g. 18-35" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Create Category
+        </button>
+
+        <a asp-action="ManageCategories"
+           asp-route-id="@ViewBag.EventId"
+           class="btn btn-outline-secondary">
+            Cancel
+        </a>
+    </form>
+</div>
