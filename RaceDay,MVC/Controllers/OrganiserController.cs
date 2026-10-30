@@ -89,5 +89,46 @@ namespace RaceDay.MVC.Controllers
 
             return View(model);
         }
+
+        // Display events created by the logged-in organiser
+        [HttpGet]
+        public async Task<IActionResult> MyEvents()
+        {
+            // Check that the user is an organiser
+            string? role = HttpContext.Session.GetString("UserRole");
+
+            if (role != "Organiser")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Get the JWT token saved during login
+            string? token = HttpContext.Session.GetString("JWToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Connect to the API
+            var client = _httpClientFactory.CreateClient("RaceDayAPI");
+
+            // Attach the JWT token
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            // Request the organiser's events from the API
+            var response = await client.GetAsync("api/organisers/events");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                TempData["ErrorMessage"] = "Could not load your events.";
+                return RedirectToAction("Index");
+            }
+
+            // Convert the API response into a list of EventViewModels
+            var events = await response.Content.ReadFromJsonAsync<List<EventViewModel>>();
+
+            return View(events ?? new List<EventViewModel>());
+        }
     }
 }
