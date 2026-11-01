@@ -1,0 +1,81 @@
+﻿@model List<RaceDay.MVC.Models.MyEnrolmentViewModel>
+
+@{
+    ViewData["Title"] = "My Enrolments";
+}
+
+<div class="container mt-4">
+
+    <div class="mb-4">
+        <h1 class="display-5 fw-bold">My Enrolments</h1>
+
+        <p class="text-muted">
+            Keep track of the events you have registered for.
+        </p>
+    </div>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-warning">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+    else if (Model.Count == 0)
+    {
+        <div class="alert alert-info">
+            You haven't enrolled in any events yet.
+
+            <a asp-controller="Events" asp-action="Index">
+                Browse available events
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+
+            @foreach (var enrolment in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card h-100 shadow-sm">
+
+                        <div class="card-body">
+
+                            <span class="badge bg-success mb-2">
+                                @enrolment.Status
+                            </span>
+
+                            <h2 class="card-title h4">
+                                @enrolment.EventName
+                            </h2>
+
+                            <hr />
+
+                            <p>
+                                <strong>Category:</strong>
+                                @enrolment.CategoryName
+                            </p>
+
+                            <p>
+                                <strong>Enrolment Date:</strong>
+                                @enrolment.EnrolmentDate.ToString("dd MMMM yyyy")
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+    <a asp-controller="Participant"
+       asp-action="Index"
+       class="btn btn-secondary mt-4">
+        Back to Dashboard
+    </a>
+
+</div>
