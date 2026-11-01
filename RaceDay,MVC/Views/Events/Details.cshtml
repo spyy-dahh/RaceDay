@@ -1,0 +1,71 @@
+﻿@model RaceDay.MVC.Models.EventDetailsViewModel
+
+@{
+    ViewData["Title"] = "Event Details";
+}
+
+<div class="container mt-4">
+
+    <h2>@Model.Event.EventName</h2>
+
+    <p>@Model.Event.Description</p>
+
+    <hr />
+
+    <h4>Event Information</h4>
+
+    <p><strong>Date:</strong> @Model.Event.EventDate.ToString("dd MMMM yyyy")</p>
+
+    <p><strong>Location:</strong> @Model.Event.Location</p>
+
+    <p><strong>Distance:</strong> @Model.Event.Distance km</p>
+
+    <p><strong>Event Type:</strong> @Model.Event.EventType</p>
+
+    <hr />
+
+    <h4>Available Categories</h4>
+
+    @if (Model.Categories.Count == 0)
+    {
+        <p>No categories have been added to this event yet.</p>
+    }
+    else
+    {
+        <div class="row">
+
+            @foreach (var category in Model.Categories)
+            {
+                <div class="col-md-4 mb-3">
+
+                    <div class="card h-100">
+                        <div class="card-body">
+
+                            <h5 class="card-title">@category.CategoryName</h5>
+
+                            <p>
+                                <strong>Distance:</strong>
+                                @(category.Distance ?? "Not specified")
+                            </p>
+
+                            <p>
+                                <strong>Age Range:</strong>
+                                @(category.AgeRange ?? "Not specified")
+                            </p>
+
+                        </div>
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+    <a asp-controller="Events"
+       asp-action="Index"
+       class="btn btn-secondary mt-3">
+        Back to Events
+    </a>
+
+</div>

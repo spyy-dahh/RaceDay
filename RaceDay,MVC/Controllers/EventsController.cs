@@ -58,5 +58,55 @@ namespace RaceDay.MVC.Controllers
             }
         }
 
+        public async Task<IActionResult> Details(int id)
+        {
+            var client = _httpClientFactory.CreateClient("RaceDayAPI");
+
+            try
+            {
+                // Retrieve the selected event from the API.
+                var eventResponse = await client.GetAsync($"api/events/{id}");
+
+                if (!eventResponse.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+
+                var eventDetails = await eventResponse.Content.ReadFromJsonAsync<EventViewModel>();
+
+                if (eventDetails == null)
+                {
+                    return NotFound();
+                }
+
+                // Retrieve the categories belonging to this event.
+                var categoryResponse = await client.GetAsync($"api/events/{id}/categories");
+
+                if (!categoryResponse.IsSuccessStatusCode)
+                {
+                    ViewBag.ErrorMessage = "Could not load the event categories.";
+                    return View(new EventDetailsViewModel
+                    {
+                        Event = eventDetails
+                    });
+                }
+
+                var categories = await categoryResponse.Content.ReadFromJsonAsync<List<CategoryViewModel>>() ?? new List<CategoryViewModel>();
+
+                // Combine the event and its categories.
+                var model = new EventDetailsViewModel
+                {
+                    Event = eventDetails,
+                    Categories = categories
+                };
+
+                return View(model);
+            }
+            catch (HttpRequestException)
+            {
+                return NotFound();
+            }
+        }
+
     }
 }
