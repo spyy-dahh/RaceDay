@@ -1,0 +1,81 @@
+﻿@model List<RaceDay.MVC.Models.OrganiserEnrolmentViewModel>
+
+@{
+    ViewData["Title"] = "Manage Enrolments";
+}
+
+<div class="container mt-4">
+
+    <div class="mb-4">
+        <h1 class="display-5 fw-bold">Manage Enrolments</h1>
+
+        <p class="text-muted">
+            View participants registered for your events.
+        </p>
+    </div>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-warning">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+    else if (Model.Count == 0)
+    {
+        <div class="alert alert-info">
+            No participants have enrolled in your events yet.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+
+            <table class="table table-striped table-hover align-middle">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>Participant</th>
+                        <th>Event</th>
+                        <th>Category</th>
+                        <th>Enrolment Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var enrolment in Model)
+                    {
+                        <tr>
+                            <td>@enrolment.ParticipantName</td>
+
+                            <td>@enrolment.EventName</td>
+
+                            <td>@enrolment.CategoryName</td>
+
+                            <td>
+                                @enrolment.EnrolmentDate.ToString("dd MMMM yyyy")
+                            </td>
+
+                            <td>
+                                <span class="badge bg-success">
+                                    @enrolment.Status
+                                </span>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+
+    <a asp-controller="Organiser"
+       asp-action="Index"
+       class="btn btn-secondary mt-3">
+        Back to Dashboard
+    </a>
+
+</div>

@@ -524,5 +524,56 @@ namespace RaceDay.MVC.Controllers
             // Return to the categories page for the same event
             return RedirectToAction("ManageCategories", new { id = eventId });
         }
+
+        // Display enrolments for events belonging to the logged-in organiser.
+        [HttpGet]
+        public async Task<IActionResult> ManageEnrolments()
+        {
+            // Check that the user is an organiser.
+            string? role = HttpContext.Session.GetString("UserRole");
+
+            if (role != "Organiser")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Get the JWT token.
+            string? token = HttpContext.Session.GetString("JWToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Connect to the API.
+            var client = _httpClientFactory.CreateClient("RaceDayAPI");
+
+            // Attach the JWT token.
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            try
+            {
+                // Retrieve enrolments for this organiser's events.
+                var response = await client.GetAsync("api/organisers/enrolments");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    ViewBag.ErrorMessage = "Could not load event enrolments.";
+
+                    return View(new List<OrganiserEnrolmentViewModel>());
+                }
+
+                // Convert the API response into a list.
+                var enrolments = await response.Content.ReadFromJsonAsync<List<OrganiserEnrolmentViewModel>>() ?? new List<OrganiserEnrolmentViewModel>();
+
+                return View(enrolments);
+            }
+            catch (HttpRequestException)
+            {
+                ViewBag.ErrorMessage = "Unable to connect to the API. Please try again later.";
+
+                return View(new List<OrganiserEnrolmentViewModel>());
+            }
+        }
     }
 }
