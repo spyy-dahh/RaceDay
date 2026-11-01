@@ -1,4 +1,6 @@
-﻿
+﻿using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Json;
 using RaceDay.MVC.Models;
@@ -105,6 +107,78 @@ namespace RaceDay.MVC.Controllers
             catch (HttpRequestException)
             {
                 return NotFound();
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Enrol(int eventId, int categoryId)
+        {
+            // Check that the participant is logged in.
+            string? role = HttpContext.Session.GetString("UserRole");
+
+            if (role != "Participant")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Get the JWT token from the session.
+            string? token = HttpContext.Session.GetString("JWToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var client = _httpClientFactory.CreateClient("RaceDayAPI");
+
+            // Attach the JWT token to the API request.
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            try
+            {
+                // Create the request body expected by the API.
+                var enrolmentData = new
+                {
+                    CategoryId = categoryId
+                };
+
+                var response = await client.PostAsJsonAsync($"api/events/{eventId}/enrolments",enrolmentData);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    TempData["SuccessMessage"] = "You have successfully enrolled in this event!";
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+
+                    try
+                    {
+                        using var errorDocument = JsonDocument.Parse(errorContent);
+
+                        if (errorDocument.RootElement.TryGetProperty("message", out var message))
+                        {
+                            TempData["ErrorMessage"] = message.GetString();
+                        }
+                        else
+                        {
+                            TempData["ErrorMessage"] = "Could not complete your enrolment.";
+                        }
+                    }
+                    catch (JsonException)
+                    {
+                        TempData["ErrorMessage"] = "Could not complete your enrolment.";
+                    }
+                }
+
+                return RedirectToAction("Details", new { id = eventId });
+            }
+            catch (HttpRequestException)
+            {
+                TempData["ErrorMessage"] = "Unable to connect to the API. Please try again later.";
+
+                return RedirectToAction("Details", new { id = eventId });
             }
         }
 

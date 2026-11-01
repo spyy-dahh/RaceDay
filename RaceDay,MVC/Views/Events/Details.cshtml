@@ -5,6 +5,19 @@
 }
 
 <div class="container mt-4">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
 
     <h2>@Model.Event.EventName</h2>
 
@@ -53,6 +66,21 @@
                                 @(category.AgeRange ?? "Not specified")
                             </p>
 
+                            <form asp-controller="Events"
+                                  asp-action="Enrol"
+                                  method="post">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden" name="eventId" value="@Model.Event.EventId" />
+
+                                <input type="hidden" name="categoryId" value="@category.CategoryId" />
+
+                                <button type="submit" class="btn btn-success w-100">
+                                    Enrol in this Category
+                                </button>
+
+                            </form>
                         </div>
                     </div>
 
