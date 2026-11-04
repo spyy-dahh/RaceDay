@@ -575,5 +575,123 @@ namespace RaceDay.MVC.Controllers
                 return View(new List<OrganiserEnrolmentViewModel>());
             }
         }
+
+        // GET: Display the form for recording a result
+        [HttpGet]
+        public async Task<IActionResult> RecordResult(int enrolmentId)
+        {
+            // Check that the logged-in user is an organiser
+            if (HttpContext.Session.GetString("UserRole") != "Organiser")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Get the JWT token
+            var token = HttpContext.Session.GetString("JWToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Connect to the API
+            var client = _httpClientFactory.CreateClient("RaceDayAPI");
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            // Retrieve the organiser's enrolments
+            var response = await client.GetAsync("api/organisers/enrolments");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                TempData["ErrorMessage"] = "Could not retrieve enrolment details.";
+                return RedirectToAction("ManageEnrolments");
+            }
+
+            var enrolments = await response.Content.ReadFromJsonAsync<List<OrganiserEnrolmentViewModel>>();
+
+            // Find the selected enrolment
+            var selectedEnrolment = enrolments?
+                .FirstOrDefault(enrolment => enrolment.EnrolmentId == enrolmentId);
+
+            if (selectedEnrolment == null)
+            {
+                TempData["ErrorMessage"] = "Enrolment could not be found.";
+                return RedirectToAction("ManageEnrolments");
+            }
+
+            // Prepare the form
+            var model = new RecordResultViewModel
+            {
+                EnrolmentId = selectedEnrolment.EnrolmentId,
+                ParticipantName = selectedEnrolment.ParticipantName,
+                EventName = selectedEnrolment.EventName,
+                CategoryName = selectedEnrolment.CategoryName
+            };
+
+            return View(model);
+        }
+
+
+        // POST: Submit the participant's result
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RecordResult(RecordResultViewModel model)
+        {
+            // Check that the logged-in user is an organiser
+            if (HttpContext.Session.GetString("UserRole") != "Organiser")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Get the JWT token
+            var token = HttpContext.Session.GetString("JWToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Convert the finish time into a TimeSpan
+            if (!TimeSpan.TryParse(model.FinishTime, out TimeSpan finishTime) || finishTime <= TimeSpan.Zero)
+            {
+                ModelState.AddModelError("FinishTime","Please enter a valid finish time greater than zero (hh:mm:ss).");
+            }
+
+            // Check whether the form contains valid information
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // Connect to the API
+            var client = _httpClientFactory.CreateClient("RaceDayAPI");
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            // Prepare the result data for the API
+            var resultData = new
+            {
+                Position = model.Position,
+                FinishTime = finishTime
+            };
+
+            // Send the result to the API
+            var response = await client.PostAsJsonAsync($"api/enrolments/{model.EnrolmentId}/results",resultData);
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["SuccessMessage"] = "Result recorded successfully.";
+                return RedirectToAction("ManageEnrolments");
+            }
+
+            // Read the API error message
+            var errorMessage = await response.Content.ReadAsStringAsync();
+
+            TempData["ErrorMessage"] = "Could not record the result. " + errorMessage;
+
+            return View(model);
+        }
     }
 }
