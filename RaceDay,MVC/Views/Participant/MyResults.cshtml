@@ -49,7 +49,7 @@
                             <td>@result.EventName</td>
                             <td>@result.CategoryName</td>
                             <td>@result.Position</td>
-                            <td>@result.FinishTime</td>
+                            <td>@result.FinishTime.ToString(@"hh\:mm\:ss")</td>
                             <td>@result.DateOfResults.ToString("dd MMM yyyy")</td>
                         </tr>
                     }

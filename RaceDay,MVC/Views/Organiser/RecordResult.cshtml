@@ -47,10 +47,16 @@
                         Finish Time (hh:mm:ss)
                     </label>
 
-                    <input asp-for="FinishTime"
+                   <input asp-for="FinishTime"
                            type="text"
                            class="form-control"
-                           placeholder="02:45:30" />
+                           placeholder="02:45:30"
+                           aria-describedby="finishTimeHelp" />
+
+                    <small id="finishTimeHelp" class="form-text text-muted">
+                        Enter the finishing time in hours:minutes:seconds format.
+                        Example: 02:45:30
+                    </small>
 
                     <span asp-validation-for="FinishTime"
                           class="text-danger"></span>

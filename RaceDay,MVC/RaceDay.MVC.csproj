@@ -7,4 +7,12 @@
     <RootNamespace>RaceDay_MVC</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\branding\" />
+    <Folder Include="wwwroot\images\events\individual\" />
+    <Folder Include="wwwroot\images\events\types\" />
+    <Folder Include="wwwroot\images\categories\" />
+    <Folder Include="wwwroot\images\profiles\" />
+  </ItemGroup>
+
 </Project>
