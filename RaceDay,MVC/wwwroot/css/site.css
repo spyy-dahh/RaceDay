@@ -1,22 +1,201 @@
+/* ==============================
+   RACEDAY - GLOBAL STYLING
+   ============================== */
+
+/* Base page settings */
 html {
-  font-size: 14px;
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
-  margin-bottom: 60px;
+    margin: 0;
+    margin-bottom: 60px;
+    background-color: #f5f7fa;
+    color: #263238;
+    font-family: "Segoe UI", Arial, sans-serif;
 }
+
+/* ==============================
+   COLOURS
+   ============================== */
+
+:root {
+    --raceday-navy: #17324d;
+    --raceday-teal: #008c83;
+    --raceday-teal-dark: #006e67;
+    --raceday-light: #f5f7fa;
+    --raceday-text: #263238;
+}
+
+/* ==============================
+   NAVIGATION BAR
+   ============================== */
+
+.navbar {
+    background-color: var(--raceday-navy) !important;
+}
+
+    .navbar .navbar-brand,
+    .navbar .nav-link {
+        color: white !important;
+    }
+
+        .navbar .nav-link:hover,
+        .navbar .navbar-brand:hover {
+            color: #8ee3d8 !important;
+        }
+
+    .navbar .navbar-toggler {
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+
+/* ==============================
+   HEADINGS
+   ============================== */
+
+h1, h2, h3, h4, h5 {
+    color: var(--raceday-navy);
+}
+
+h1, h2 {
+    font-weight: 700;
+}
+
+/* ==============================
+   BUTTONS
+   ============================== */
+
+.btn {
+    border-radius: 6px;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--raceday-teal);
+    border-color: var(--raceday-teal);
+}
+
+    .btn-primary:hover {
+        background-color: var(--raceday-teal-dark);
+        border-color: var(--raceday-teal-dark);
+    }
+
+.btn-success {
+    background-color: #23865b;
+    border-color: #23865b;
+}
+
+    .btn-success:hover {
+        background-color: #196b47;
+        border-color: #196b47;
+    }
+
+/* ==============================
+   CARDS
+   ============================== */
+
+.card {
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+    .card.shadow-sm {
+        box-shadow: 0 3px 12px rgba(23, 50, 77, 0.08) !important;
+    }
+
+.card-title {
+    font-weight: 700;
+    color: var(--raceday-navy);
+}
+
+.card-img-top {
+    object-fit: cover;
+}
+
+/* ==============================
+   FORMS
+   ============================== */
+
+.form-control,
+.form-select {
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+}
+
+    .form-control:focus,
+    .form-select:focus,
+    .form-check-input:focus {
+        border-color: var(--raceday-teal);
+        box-shadow: 0 0 0 0.2rem rgba(0, 140, 131, 0.2);
+    }
+
+/* ==============================
+   TABLES
+   ============================== */
+
+.table thead th {
+    background-color: var(--raceday-navy);
+    color: white;
+    border-color: var(--raceday-navy);
+}
+
+.table {
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* ==============================
+   ALERTS
+   ============================== */
+
+.alert {
+    border-radius: 8px;
+}
+
+/* ==============================
+   LINKS
+   ============================== */
+
+a {
+    color: var(--raceday-teal-dark);
+}
+
+    a:hover {
+        color: var(--raceday-navy);
+    }
+
+/* ==============================
+   FOCUS ACCESSIBILITY
+   ============================== */
+
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    outline: none;
+}
+
+/* ==============================
+   FOOTER
+   ============================== */
+
+footer {
+    background-color: var(--raceday-navy);
+    color: white;
+    padding: 15px 0;
+}
+
+    footer a {
+        color: #8ee3d8;
+    }
