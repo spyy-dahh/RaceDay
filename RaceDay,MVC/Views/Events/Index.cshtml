@@ -93,8 +93,23 @@
         <div class="row g-4">
             @foreach (var eventItem in Model)
             {
+                // Select an image based on the event type.
+                string imagePath = eventItem.EventType?.ToLower() switch
+                {
+                    "run" => "~/images/events/types/run.jpg",
+                    "walk" => "~/images/events/types/walk.jpg",
+                    "cycle" => "~/images/events/types/cycle.jpg",
+                    _ => "~/images/events/types/placeholder.jpg"
+                };
+
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 shadow-sm">
+
+                        <!-- Event image -->
+                        <img src="@Url.Content(imagePath)"
+                             class="card-img-top"
+                             alt="@eventItem.EventType event"
+                             style="height: 200px; object-fit: cover;" />
 
                         <div class="card-body">
 
@@ -133,8 +148,8 @@
                                class="btn btn-primary mt-2">
                                 View Details
                             </a>
-                        </div>
 
+                        </div>
                     </div>
                 </div>
             }
