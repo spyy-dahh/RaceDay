@@ -72,6 +72,53 @@ namespace RaceDay.MVC.Controllers
                 return View(new List<MyEnrolmentViewModel>());
             }
         }
+
+        // Display the participant's results
+        [HttpGet]
+        public async Task<IActionResult> MyResults()
+        {
+            // Check that the logged-in user is a participant
+            if (HttpContext.Session.GetString("UserRole") != "Participant")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Get the JWT token
+            var token = HttpContext.Session.GetString("JWToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Connect to the API
+            var client = _httpClientFactory.CreateClient("RaceDayAPI");
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            try
+            {
+                // Retrieve the participant's results
+                var response = await client.GetAsync("api/results/myResults");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    ViewBag.ErrorMessage = "Could not retrieve your results.";
+
+                    return View(new List<MyResultViewModel>());
+                }
+
+                var results = await response.Content.ReadFromJsonAsync<List<MyResultViewModel>>();
+
+                return View(results ?? new List<MyResultViewModel>());
+            }
+            catch (HttpRequestException)
+            {
+                ViewBag.ErrorMessage = "Unable to connect to the RaceDay API.";
+
+                return View(new List<MyResultViewModel>());
+            }
+        }
     }
 }
 
