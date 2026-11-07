@@ -1,4 +1,5 @@
-﻿@{
+﻿
+@{
     ViewData["Title"] = "Organiser Dashboard";
 }
 
@@ -16,6 +17,7 @@
 
     <div class="row g-4">
 
+        <!-- Browse Events -->
         <div class="col-md-6 col-lg-4">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
@@ -34,47 +36,14 @@
             </div>
         </div>
 
+        <!-- Create and Manage Events -->
         <div class="col-md-6 col-lg-4">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
                     <h3 class="h5 card-title">Manage My Events</h3>
 
                     <p class="card-text">
-                        Create, update and manage the events you organise.
-                    </p>
-
-                    <a asp-controller="Organiser"
-                       asp-action="CreateEvent"
-                       class="btn btn-primary">
-                        Create Event
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h3 class="h5 card-title">Enrolments</h3>
-
-                    <p class="card-text">
-                        View participants enrolled in your events.
-                    </p>
-
-                    <span class="badge text-bg-secondary">
-                        Coming next
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h3 class="h5 card-title">Race Results</h3>
-
-                    <p class="card-text">
-                        Record and manage participants' race results.
+                        Create, update, delete and manage your events.
                     </p>
 
                     <a asp-controller="Organiser"
@@ -86,16 +55,14 @@
             </div>
         </div>
 
-        <div class="col-md-4 mb-3">
-
+        <!-- Manage Enrolments -->
+        <div class="col-md-6 col-lg-4">
             <div class="card h-100 shadow-sm">
-
                 <div class="card-body">
-
-                    <h5 class="card-title">Manage Enrolments</h5>
+                    <h3 class="h5 card-title">Manage Enrolments</h3>
 
                     <p class="card-text">
-                        View participants who have registered for your events.
+                        View participants enrolled in your events.
                     </p>
 
                     <a asp-controller="Organiser"
@@ -103,25 +70,44 @@
                        class="btn btn-primary">
                         View Enrolments
                     </a>
-
                 </div>
-
             </div>
-
         </div>
 
+        <!-- Manage Categories -->
         <div class="col-md-6 col-lg-4">
             <div class="card h-100 shadow-sm">
                 <div class="card-body">
-                    <h3 class="h5 card-title">Categories</h3>
+                    <h3 class="h5 card-title">Manage Categories</h3>
 
                     <p class="card-text">
-                        Set up categories for your events.
+                        Create, update and delete categories for your events.
                     </p>
 
-                    <span class="badge text-bg-secondary">
-                        Coming next
-                    </span>
+                    <a asp-controller="Organiser"
+                       asp-action="MyEvents"
+                       class="btn btn-primary">
+                        Manage Categories
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Race Results -->
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h3 class="h5 card-title">Race Results</h3>
+
+                    <p class="card-text">
+                        View event enrolments and record participants' race results.
+                    </p>
+
+                    <a asp-controller="Organiser"
+                       asp-action="ManageEnrolments"
+                       class="btn btn-primary">
+                        Manage Results
+                    </a>
                 </div>
             </div>
         </div>
