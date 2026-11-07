@@ -1,0 +1,71 @@
+﻿@model RaceDay.MVC.Models.RecordResultViewModel
+
+@{
+    ViewData["Title"] = "Record Result";
+}
+
+<div class="container mt-4">
+    <h2>Record Participant Result</h2>
+
+    <div class="card shadow-sm mt-3">
+        <div class="card-body">
+
+            <h5>Participant: @Model.ParticipantName</h5>
+            <p>Event: @Model.EventName</p>
+            <p>Category: @Model.CategoryName</p>
+
+            <hr />
+
+            <form asp-action="RecordResult" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="EnrolmentId" />
+                <input type="hidden" asp-for="ParticipantName" />
+                <input type="hidden" asp-for="EventName" />
+                <input type="hidden" asp-for="CategoryName" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Position" class="form-label">
+                        Finishing Position
+                    </label>
+
+                    <input asp-for="Position"
+                           type="number"
+                           min="1"
+                           class="form-control" />
+
+                    <span asp-validation-for="Position"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="FinishTime" class="form-label">
+                        Finish Time (hh:mm:ss)
+                    </label>
+
+                    <input asp-for="FinishTime"
+                           type="text"
+                           class="form-control"
+                           placeholder="02:45:30" />
+
+                    <span asp-validation-for="FinishTime"
+                          class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Save Result
+                </button>
+
+                <a asp-action="ManageEnrolments"
+                   class="btn btn-secondary">
+                    Cancel
+                </a>
+
+            </form>
+        </div>
+    </div>
+</div>
