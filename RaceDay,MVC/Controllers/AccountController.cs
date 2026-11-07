@@ -1,4 +1,4 @@
-﻿
+﻿using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -133,6 +133,88 @@ namespace RaceDay.MVC.Controllers
             TempData["SuccessMessage"] = "You have been logged out.";
 
             return RedirectToAction("Login", "Account");
+        }
+
+        // GET: Display the logged-in user's profile
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            // Get the JWT token
+            var token = HttpContext.Session.GetString("JWToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login");
+            }
+
+            // Connect to the API
+            var client = _httpClientFactory.CreateClient("RaceDayAPI");
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            // Retrieve the user's profile
+            var response = await client.GetAsync("api/users/profile");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                TempData["ErrorMessage"] = "Could not retrieve your profile.";
+                return RedirectToAction("Login");
+            }
+
+            var profile = await response.Content.ReadFromJsonAsync<UserProfileViewModel>();
+
+            if (profile == null)
+            {
+                TempData["ErrorMessage"] = "Profile information could not be loaded.";
+                return RedirectToAction("Login");
+            }
+
+            return View(profile);
+        }
+
+
+        // POST: Update the user's contact number
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Profile(UserProfileViewModel model)
+        {
+            // Check whether the form contains valid information
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // Get the JWT token
+            var token = HttpContext.Session.GetString("JWToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login");
+            }
+
+            // Connect to the API
+            var client = _httpClientFactory.CreateClient("RaceDayAPI");
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            // Send only the contact number because that is what the API accepts
+            var updateData = new
+            {
+                ContactNumber = model.ContactNumber
+            };
+
+            var response = await client.PutAsJsonAsync("api/users/profile",updateData);
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["SuccessMessage"] = "Your profile has been updated successfully.";
+
+                return RedirectToAction("Profile");
+            }
+
+            TempData["ErrorMessage"] = "Could not update your profile. Please try again.";
+
+            return View(model);
         }
 
     }

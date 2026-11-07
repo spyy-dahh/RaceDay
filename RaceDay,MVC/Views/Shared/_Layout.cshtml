@@ -65,12 +65,22 @@
                             </li>
                         }
 
+                        @if (Context.Session.GetString("JWToken") != null)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Account"
+                                   asp-action="Profile">
+                                    My Profile
+                                </a>
+                            </li>
+                        }
+
                     </ul>
 
                     <ul class="navbar-nav">
 
-                        @if (userRole == "Organiser" ||
-                             userRole == "Participant")
+                        @if (userRole == "Organiser" ||userRole == "Participant")
                         {
                             <li class="nav-item d-flex align-items-center">
                                 <span class="navbar-text me-3">

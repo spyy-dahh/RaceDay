@@ -1,0 +1,91 @@
+﻿@model RaceDay.MVC.Models.UserProfileViewModel
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container mt-4">
+
+    <h2>My Profile</h2>
+    <p class="text-muted">View and update your account information.</p>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="card shadow-sm mt-3">
+        <div class="card-body">
+
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input value="@Model.UserName"
+                       class="form-control"
+                       readonly />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email Address</label>
+                <input value="@Model.EmailAddress"
+                       class="form-control"
+                       readonly />
+            </div>
+
+            <form asp-controller="Account"
+                  asp-action="Profile"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="UserId" />
+                <input type="hidden" asp-for="UserName" />
+                <input type="hidden" asp-for="EmailAddress" />
+
+                <div class="mb-3">
+                    <label asp-for="ContactNumber" class="form-label">
+                        Contact Number
+                    </label>
+
+                    <input asp-for="ContactNumber"
+                           class="form-control" />
+
+                    <span asp-validation-for="ContactNumber"
+                          class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Update Profile
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
+   @if (Context.Session.GetString("UserRole") == "Organiser")
+{
+    <a asp-controller="Organiser"
+       asp-action="Index"
+       class="btn btn-secondary mt-3">
+        Back to Dashboard
+    </a>
+}
+else
+{
+    <a asp-controller="Participant"
+       asp-action="Index"
+       class="btn btn-secondary mt-3">
+        Back to Dashboard
+    </a>
+}
+
+</div>
