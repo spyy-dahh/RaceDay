@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - RaceDay_MVC</title>
+    <title>@ViewData["Title"] - RaceDay</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/RaceDay_MVC.styles.css" asp-append-version="true" />
@@ -16,15 +17,17 @@
             var userRole = Context.Session.GetString("UserRole");
         }
 
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <nav class="navbar navbar-expand-lg navbar-dark raceday-navbar">
             <div class="container">
 
+                <!-- Website Brand -->
                 <a class="navbar-brand fw-bold"
-                   asp-controller="Home"
-                   asp-action="Index">
+                   asp-controller="@(userRole == "Organiser" ? "Organiser" : userRole == "Participant" ? "Participant" : "Account")"
+                   asp-action="@(userRole == "Organiser" || userRole == "Participant" ? "Index" : "Register")">
                     RaceDay
                 </a>
 
+                <!-- Mobile Navigation Button -->
                 <button class="navbar-toggler"
                         type="button"
                         data-bs-toggle="collapse"
@@ -34,10 +37,11 @@
 
                 <div class="collapse navbar-collapse" id="mainNavbar">
 
-                    <ul class="navbar-nav me-auto">
+                    <!-- Main Navigation Links -->
+                    <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
 
                         <li class="nav-item">
-                            <a class="nav-link"
+                            <a class="nav-link nav-link-box"
                                asp-controller="Events"
                                asp-action="Index">
                                 Events
@@ -47,7 +51,7 @@
                         @if (userRole == "Organiser")
                         {
                             <li class="nav-item">
-                                <a class="nav-link"
+                                <a class="nav-link nav-link-box"
                                    asp-controller="Organiser"
                                    asp-action="Index">
                                     Dashboard
@@ -57,7 +61,7 @@
                         else if (userRole == "Participant")
                         {
                             <li class="nav-item">
-                                <a class="nav-link"
+                                <a class="nav-link nav-link-box"
                                    asp-controller="Participant"
                                    asp-action="Index">
                                     Dashboard
@@ -68,26 +72,37 @@
                         @if (Context.Session.GetString("JWToken") != null)
                         {
                             <li class="nav-item">
-                                <a class="nav-link"
+                                <a class="nav-link nav-link-box"
                                    asp-controller="Account"
                                    asp-action="Profile">
-                                    My Profile
+                                    My Profile (@userRole)
                                 </a>
                             </li>
                         }
 
-                    </ul>
-
-                    <ul class="navbar-nav">
-
-                        @if (userRole == "Organiser" ||userRole == "Participant")
+                        <!-- Login / Register for logged-out users -->
+                        @if (userRole != "Organiser" && userRole != "Participant")
                         {
-                            <li class="nav-item d-flex align-items-center">
-                                <span class="navbar-text me-3">
-                                    @userRole
-                                </span>
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-box"
+                                   asp-controller="Account"
+                                   asp-action="Register">
+                                    Register
+                                </a>
                             </li>
 
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-box"
+                                   asp-controller="Account"
+                                   asp-action="Login">
+                                    Log In
+                                </a>
+                            </li>
+                        }
+
+                        <!-- Logout for logged-in users -->
+                        @if (userRole == "Organiser" || userRole == "Participant")
+                        {
                             <li class="nav-item">
                                 <form asp-controller="Account"
                                       asp-action="Logout"
@@ -96,29 +111,11 @@
                                     @Html.AntiForgeryToken()
 
                                     <button type="submit"
-                                            class="btn btn-outline-light btn-sm">
+                                            class="btn btn-outline-light btn-sm logout-button">
                                         Log Out
                                     </button>
 
                                 </form>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link"
-                                   asp-controller="Account"
-                                   asp-action="Register">
-                                    Register
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link"
-                                   asp-controller="Account"
-                                   asp-action="Login">
-                                    Log In
-                                </a>
                             </li>
                         }
 
@@ -129,6 +126,7 @@
         </nav>
 
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -137,12 +135,15 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2026 - RaceDay_MVC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2026 - RaceDay - 
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
