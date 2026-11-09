@@ -93,20 +93,32 @@
         <div class="row g-4">
             @foreach (var eventItem in Model)
             {
-                // Select an image based on the event type.
-                string imagePath = eventItem.EventType?.ToLower() switch
+                // Use the uploaded event image if one exists.
+                string imagePath;
+
+                if (!string.IsNullOrWhiteSpace(eventItem.ImageName))
                 {
-                    "run" => "~/images/events/types/run.jpg",
-                    "walk" => "~/images/events/types/walk.jpg",
-                    "cycle" => "~/images/events/types/cycle.jpg",
-                    _ => "~/images/events/types/placeholder.jpg"
-                };
+                    imagePath = $"https://localhost:7252/api/events/{eventItem.EventId}/image";
+                }
+                else
+                {
+                    // Otherwise, use the default image based on event type.
+                    imagePath = eventItem.EventType?.ToLower() switch
+                    {
+                        "run" => "~/images/events/types/run.jpg",
+                        "walk" => "~/images/events/types/walk.jpg",
+                        "cycle" => "~/images/events/types/cycle.jpg",
+                        _ => "~/images/events/types/placeholder.jpg"
+                    };
+
+                    imagePath = Url.Content(imagePath);
+                }
 
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 shadow-sm">
 
                         <!-- Event image -->
-                        <img src="@Url.Content(imagePath)"
+                        <img src="@imagePath"
                              class="card-img-top"
                              alt="@eventItem.EventType event"
                              style="height: 200px; object-fit: cover;" />

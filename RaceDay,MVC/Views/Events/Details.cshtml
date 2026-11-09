@@ -1,17 +1,32 @@
 ﻿@model RaceDay.MVC.Models.EventDetailsViewModel
 
+
 @{
     ViewData["Title"] = "Event Details";
 
-    // Select an image based on the event type.
-    string imagePath = Model.Event.EventType?.ToLower() switch
+    string imagePath;
+
+    // Use the uploaded event image if one exists.
+    if (!string.IsNullOrWhiteSpace(Model.Event.ImageName))
     {
-        "run" => "~/images/events/types/run.jpg",
-        "walk" => "~/images/events/types/walk.jpg",
-        "cycle" => "~/images/events/types/cycle.jpg",
-        _ => "~/images/events/types/placeholder.jpg"
-    };
+        imagePath = $"https://localhost:7252/api/events/{Model.Event.EventId}/image";
+    }
+    else
+    {
+        // Otherwise, use the default image based on event type.
+        imagePath = Model.Event.EventType?.ToLower() switch
+        {
+            "run" => "~/images/events/types/run.jpg",
+            "walk" => "~/images/events/types/walk.jpg",
+            "cycle" => "~/images/events/types/cycle.jpg",
+            _ => "~/images/events/types/placeholder.jpg"
+        };
+
+        imagePath = Url.Content(imagePath);
+    }
 }
+
+
 
 <div class="container mt-4">
     @if (TempData["SuccessMessage"] != null)
@@ -33,7 +48,7 @@
     <p class="text-muted">@Model.Event.Description</p>
 
     <!-- Event image -->
-    <img src="@Url.Content(imagePath)"
+    <img src="@imagePath"
          alt="@Model.Event.EventType event"
          class="img-fluid rounded shadow-sm mb-4"
          style="width: 100%; height: 350px; object-fit: cover;" />

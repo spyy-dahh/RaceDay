@@ -18,5 +18,8 @@ namespace RaceDay.MVC.Models
 
         // For example: Run, Walk or Cycle.
         public string EventType { get; set; } = string.Empty;
+
+        // Stores the name of the uploaded event banner, if one exists.
+        public string? ImageName { get; set; }
     }
 }
