@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using RaceDay.API.Data;
 using RaceDay.Api.Models;
 using RaceDay.Api.Models.DTOs;
+using RaceDay.API.Services;
 
 namespace RaceDay.Api.Controllers
 {
@@ -13,10 +14,12 @@ namespace RaceDay.Api.Controllers
     public class EventsController : ControllerBase
     {
         private readonly RaceDayDbContext _context;
+        private readonly BlobStorageService _blobStorageService;
 
-        public EventsController(RaceDayDbContext context)
+        public EventsController(RaceDayDbContext context, BlobStorageService blobStorageService)
         {
             _context = context;
+            _blobStorageService = blobStorageService;
         }
 
         // Get all events
@@ -43,6 +46,48 @@ namespace RaceDay.Api.Controllers
             }
 
             return Ok(eventItem);
+        }
+
+        // Get an event banner image
+        [HttpGet("{id}/image")]
+        public async Task<IActionResult> GetEventImage(int id)
+        {
+            // Find the event
+            var eventItem = await _context.Events.FirstOrDefaultAsync(eventItem => eventItem.EventId == id);
+
+            if (eventItem == null)
+            {
+                return NotFound(new
+                {
+                    message = "Event not found."
+                });
+            }
+
+            // Check whether the event has an image
+            if (string.IsNullOrEmpty(eventItem.ImageName))
+            {
+                return NotFound(new
+                {
+                    message = "This event does not have an image."
+                });
+            }
+
+            // Retrieve the image from Blob Storage
+            var image = await _blobStorageService.GetImageAsync(eventItem.ImageName);
+
+            if (image == null)
+            {
+                return NotFound(new
+                {
+                    message = "Event image not found."
+                });
+            }
+
+            // Return the image to the browser
+            return File(
+                image.Content,
+                image.Details.ContentType ?? "application/octet-stream"
+            );
         }
 
         // Create a new event
@@ -114,6 +159,87 @@ namespace RaceDay.Api.Controllers
                 eventID = eventItem.EventId,
                 message = "Event created successfully."
             });
+        }
+
+        // Upload or replace an event banner image
+        [Authorize(Roles = "Organiser")]
+        [HttpPost("{id}/image")]
+        public async Task<IActionResult> UploadEventImage(int id, [FromForm] IFormFile image)
+        {
+            // Find the logged-in user's ID
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new
+                {
+                    message = "User is not authenticated."
+                });
+            }
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            // Find the organiser
+            var organiser = await _context.EventOrganisers.FirstOrDefaultAsync(organiser => organiser.UserId == userId);
+
+            if (organiser == null)
+            {
+                return NotFound(new
+                {
+                    message = "Organiser profile not found."
+                });
+            }
+
+            // Find the event
+            var eventItem = await _context.Events
+                .FirstOrDefaultAsync(eventItem => eventItem.EventId == id);
+
+            if (eventItem == null)
+            {
+                return NotFound(new
+                {
+                    message = "Event not found."
+                });
+            }
+
+            // Check that the organiser owns this event
+            if (eventItem.OrganiserId != organiser.OrganiserId)
+            {
+                return Forbid();
+            }
+
+            // Remember the previous image name
+            string? oldImageName = eventItem.ImageName;
+
+            try
+            {
+                // Upload the new image to Blob Storage
+                string newImageName = await _blobStorageService.UploadImageAsync(image);
+
+                // Save the new image name in the database
+                eventItem.ImageName = newImageName;
+
+                await _context.SaveChangesAsync();
+
+                // Delete the previous image if one existed
+                if (!string.IsNullOrEmpty(oldImageName))
+                {
+                    await _blobStorageService.DeleteImageAsync(oldImageName);
+                }
+
+                return Ok(new
+                {
+                    message = "Event image uploaded successfully.",
+                    imageName = newImageName
+                });
+            }
+            catch (ArgumentException exception)
+            {
+                return BadRequest(new
+                {
+                    message = exception.Message
+                });
+            }
         }
 
         // Update an event
