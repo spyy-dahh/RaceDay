@@ -14,8 +14,9 @@ namespace RaceDay.MVC.Controllers
         {
             _httpClientFactory = httpClientFactory;
         }
-        // Display the organiser dashboard.
-        public IActionResult Index()
+        // Display the organiser dashboard and its summary statistics.
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
             // Only logged-in organisers can access this page.
             string? role = HttpContext.Session.GetString("UserRole");
@@ -25,7 +26,77 @@ namespace RaceDay.MVC.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            return View();
+            // Get the JWT token saved during login.
+            string? token = HttpContext.Session.GetString("JWToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Connect to the API.
+            var client = _httpClientFactory.CreateClient("RaceDayAPI");
+
+            // Attach the JWT token to the requests.
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            try
+            {
+                // Retrieve the organiser's events.
+                var eventsResponse = await client.GetAsync("api/organisers/events");
+
+                if (!eventsResponse.IsSuccessStatusCode)
+                {
+                    TempData["ErrorMessage"] = "Could not load your dashboard events.";
+                    return View(new OrganiserDashboardViewModel());
+                }
+
+                var events = await eventsResponse.Content
+                    .ReadFromJsonAsync<List<EventViewModel>>();
+
+                // Retrieve enrolments for the organiser's events.
+                var enrolmentsResponse = await client.GetAsync("api/organisers/enrolments");
+
+                if (!enrolmentsResponse.IsSuccessStatusCode)
+                {
+                    TempData["ErrorMessage"] = "Could not load your dashboard enrolments.";
+                    return View(new OrganiserDashboardViewModel
+                    {
+                        Events = events ?? new List<EventViewModel>(),
+                        TotalEvents = events?.Count ?? 0,
+                        UpcomingEvents = events?.Count(eventItem =>
+                            eventItem.EventDate.Date >= DateTime.Today) ?? 0
+                    });
+                }
+
+                var enrolments = await enrolmentsResponse.Content
+                    .ReadFromJsonAsync<List<OrganiserEnrolmentViewModel>>();
+
+                // Create the dashboard model.
+                var dashboard = new OrganiserDashboardViewModel
+                {
+                    Events = events ?? new List<EventViewModel>(),
+                    Enrolments = enrolments ?? new List<OrganiserEnrolmentViewModel>()
+                };
+
+                // Calculate the dashboard statistics.
+                dashboard.TotalEvents = dashboard.Events.Count;
+
+                dashboard.TotalEnrolments = dashboard.Enrolments.Count;
+
+                dashboard.UpcomingEvents = dashboard.Events.Count(eventItem =>
+                    eventItem.EventDate.Date >= DateTime.Today);
+
+                return View(dashboard);
+            }
+            catch (HttpRequestException)
+            {
+                TempData["ErrorMessage"] =
+                    "Unable to connect to RaceDay. Please try again later.";
+
+                return View(new OrganiserDashboardViewModel());
+            }
         }
 
         // Display the Create Event form

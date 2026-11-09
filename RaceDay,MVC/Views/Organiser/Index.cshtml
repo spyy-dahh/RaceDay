@@ -1,4 +1,5 @@
-﻿
+﻿@model RaceDay.MVC.Models.OrganiserDashboardViewModel
+
 @{
     ViewData["Title"] = "Organiser Dashboard";
 }
@@ -24,6 +25,114 @@
                      class="img-fluid w-100"
                      style="height: 230px; object-fit: cover;" />
             </div>
+
+        </div>
+    </div>
+
+    <!-- Dashboard Summary -->
+    <h2 class="h4 mb-3">Dashboard Overview</h2>
+
+    <div class="row g-4 mb-5">
+
+        <!-- Total Events -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 border-primary">
+                <div class="card-body">
+                    <h3 class="h6 text-muted">Total Events Created</h3>
+
+                    <p class="display-5 fw-bold text-primary mb-0">
+                        @Model.TotalEvents
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Enrolments -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 border-success">
+                <div class="card-body">
+                    <h3 class="h6 text-muted">Total Enrolments</h3>
+
+                    <p class="display-5 fw-bold text-success mb-0">
+                        @Model.TotalEnrolments
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Events -->
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100 border-warning">
+                <div class="card-body">
+                    <h3 class="h6 text-muted">Upcoming Events</h3>
+
+                    <p class="display-5 fw-bold text-warning mb-0">
+                        @Model.UpcomingEvents
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Event Enrolment Summary -->
+    <h2 class="h4 mb-3">Event Enrolment Summary</h2>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-body">
+
+            @if (Model.Events.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>Event Name</th>
+                                <th>Event Date</th>
+                                <th>Event Type</th>
+                                <th>Total Enrolments</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var eventItem in Model.Events)
+                            {
+                                // Count enrolments belonging to this event.
+                                int enrolmentCount = Model.Enrolments.Count(
+                                    enrolment => enrolment.EventId == eventItem.EventId);
+
+                                <tr>
+                                    <td class="fw-semibold">
+                                        @eventItem.EventName
+                                    </td>
+
+                                    <td>
+                                        @eventItem.EventDate.ToString("dd MMM yyyy")
+                                    </td>
+
+                                    <td>
+                                        @eventItem.EventType
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-primary">
+                                            @enrolmentCount
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted mb-0">
+                    You have not created any events yet.
+                </p>
+            }
 
         </div>
     </div>
