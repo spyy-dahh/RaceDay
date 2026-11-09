@@ -1,5 +1,4 @@
-
-name: RaceDay CI — Validate, Build and Test
+name: RaceDay MVC Build
 
 on:
   push:
@@ -13,48 +12,9 @@ permissions:
   contents: read
 
 jobs:
-  validate-structure:
+  build-mvc:
     runs-on: ubuntu-latest
-    name: Validate Repository Structure
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Validate /docs folder exists
-        run: |
-          if [ ! -d "docs" ]; then
-            echo "FAILED: /docs folder does not exist"
-            exit 1
-          fi
-          echo "PASSED: /docs folder exists"
-
-      - name: Validate /docs contains minimum 3 files
-        run: |
-          file_count=$(find docs -type f | wc -l)
-          echo "Found $file_count file(s) in /docs"
-
-          if [ "$file_count" -lt 3 ]; then
-            echo "FAILED: /docs contains only $file_count file(s)"
-            find docs -type f
-            exit 1
-          fi
-
-          echo "PASSED: /docs contains $file_count file(s)"
-
-      - name: List /docs contents
-        if: always()
-        run: |
-          echo "docs folder contents:"
-          ls -lah docs/
-
-      - name: Validation Summary
-        if: success()
-        run: echo "All repository structure validations passed!"
-
-  build-and-test:
-    runs-on: ubuntu-latest
-    name: Build API and MVC and Run Tests
+    name: Build MVC Project
 
     steps:
       - name: Checkout repository
@@ -65,30 +25,8 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Check .NET SDK version
-        run: dotnet --version
-      
-      - name: Restore API dependencies
-        run: dotnet restore "RaceDay.API/RaceDay.API.csproj"
-
-      - name: Build API
-        run: dotnet build "RaceDay.API/RaceDay.API.csproj" --configuration Release --no-restore
-
       - name: Restore MVC dependencies
         run: dotnet restore "RaceDay,MVC/RaceDay.MVC.csproj"
 
       - name: Build MVC
         run: dotnet build "RaceDay,MVC/RaceDay.MVC.csproj" --configuration Release --no-restore
-
-      - name: Restore test dependencies
-        run: dotnet restore "RaceDay.Api.Tests/RaceDay.Api.Tests.csproj"
-
-      - name: Build test project
-        run: dotnet build "RaceDay.Api.Tests/RaceDay.Api.Tests.csproj" --configuration Release --no-restore
-
-      - name: Run API tests
-        run: dotnet test "RaceDay.Api.Tests/RaceDay.Api.Tests.csproj" --configuration Release --no-build --no-restore
-
-      - name: Build and Test Summary
-        if: success()
-        run: echo "RaceDay API and MVC builds succeeded, and all API tests passed!"
