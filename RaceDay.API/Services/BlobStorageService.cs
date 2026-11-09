@@ -59,7 +59,15 @@ namespace RaceDay.API.Services
             // Open and upload the image
             using (Stream imageStream = image.OpenReadStream())
             {
-                await blobClient.UploadAsync(imageStream, overwrite: true);
+                await blobClient.UploadAsync(
+                    imageStream,
+                    new BlobUploadOptions
+                    {
+                        HttpHeaders = new BlobHttpHeaders
+                        {
+                            ContentType = image.ContentType
+                        }
+                    });
             }
 
             // Return the image name so it can be saved in the database

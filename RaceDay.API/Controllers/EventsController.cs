@@ -164,7 +164,7 @@ namespace RaceDay.Api.Controllers
         // Upload or replace an event banner image
         [Authorize(Roles = "Organiser")]
         [HttpPost("{id}/image")]
-        public async Task<IActionResult> UploadEventImage(int id, [FromForm] IFormFile image)
+        public async Task<IActionResult> UploadEventImage(int id, IFormFile image)
         {
             // Find the logged-in user's ID
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
