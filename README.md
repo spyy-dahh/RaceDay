@@ -108,6 +108,114 @@ A screenshot of the CI/CD :
 
 ---
 
+## Docker Deployment
+
+RaceDay MVC is containerised using Docker to provide a consistent environment for running the web application.
+
+The Docker configuration uses the official .NET 8 SDK image to build the application and the .NET 8 ASP.NET runtime image to run it.
+
+### Prerequisites
+
+Before running RaceDay through Docker, ensure that the following are installed and running:
+
+- Docker Desktop
+- .NET 8 SDK
+- SQL Server / SQL Server LocalDB
+- Azurite (Azure Blob Storage emulator)
+
+### Docker Configuration
+
+The MVC project contains the following Docker configuration files:
+
+| File | Purpose |
+|------|---------|
+| `Dockerfile` | Builds and publishes the MVC application into a Docker image. |
+| `.dockerignore` | Excludes unnecessary files and folders from the Docker build context. |
+
+### Running the Application
+
+**1. Start Azurite**
+
+Start the existing Azurite container:
+
+```powershell
+docker start raceday-azurite
+```
+
+**2. Start the REST API**
+
+Navigate to the `RaceDay.API` project directory and run:
+
+```powershell
+dotnet run --launch-profile docker-host
+```
+
+The API listens on:
+
+`http://localhost:5298`
+
+Keep the API running while using the MVC application.
+
+**3. Build the MVC Docker Image**
+
+Navigate to the `RaceDay.MVC` project directory and execute:
+
+```powershell
+docker build -t raceday-mvc .
+```
+
+This builds the MVC application and creates a Docker image named `raceday-mvc`.
+
+**4. Run the MVC Container**
+
+Execute:
+
+```powershell
+docker run -d -p 8080:8080 -e ApiSettings__BaseUrl=http://host.docker.internal:5298/ --name raceday-mvc-container raceday-mvc
+```
+
+This starts the MVC application inside a Docker container and connects it to the REST API running on the host machine.
+
+**5. Access RaceDay**
+
+Open a browser and navigate to:
+
+`http://localhost:8080`
+
+The RaceDay MVC application should now be accessible through Docker.
+
+### Stopping the Application
+
+To stop the MVC container:
+
+```powershell
+docker stop raceday-mvc-container
+```
+
+To remove the stopped container:
+
+```powershell
+docker rm raceday-mvc-container
+```
+
+To stop the API, press `Ctrl + C` in its terminal.
+
+Azurite can be stopped separately using:
+
+```powershell
+docker stop raceday-azurite
+```
+
+### Image Storage
+
+The REST API handles image uploads and retrieval through the Blob Storage service. Azurite is used as a local Azure Blob Storage emulator during development.
+
+The MVC application communicates with the API for image handling rather than connecting directly to Blob Storage.
+
+This allows uploaded event banners and profile pictures to be displayed while the MVC application runs inside Docker.
+
+---
+
 ## Demonstration Video
 
 The project demonstration video is available through the unlisted YouTube link below.
