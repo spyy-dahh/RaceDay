@@ -8,9 +8,13 @@
 
         public string EventName { get; set; } = string.Empty;
 
+        public DateTime EventDate { get; set; }
+
         public string CategoryName { get; set; } = string.Empty;
 
         public int Position { get; set; }
+
+        public int TotalParticipants { get; set; }
 
         public string FinishTime { get; set; } = string.Empty;
 

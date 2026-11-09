@@ -172,8 +172,10 @@ namespace RaceDay.Api.Controllers
                     resultID = result.ResultId,
                     eventID = eventItem.EventId,
                     eventName = eventItem.EventName,
+                    eventDate = eventItem.EventDate,
                     categoryName = category.CategoryName,
                     position = result.Position,
+                    totalParticipants = _context.EventEnrolments.Count(enrolmentItem => enrolmentItem.EventId == eventItem.EventId),
                     finishTime = result.FinishTime,
                     dateOfResults = result.DateOfResults
                 }
