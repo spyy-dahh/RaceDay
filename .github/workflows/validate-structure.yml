@@ -1,5 +1,5 @@
 
-name: Validate Repository Structure and Build Projects
+name: RaceDay CI — Validate, Build and Test
 
 on:
   push:
@@ -13,10 +13,13 @@ on:
       - main
       - develop
 
+permissions:
+  contents: read
+
 jobs:
   validate-structure:
     runs-on: ubuntu-latest
-    name: Check Repository Structure
+    name: Validate Repository Structure
 
     steps:
       - name: Checkout repository
@@ -25,10 +28,10 @@ jobs:
       - name: Validate /docs folder exists
         run: |
           if [ ! -d "docs" ]; then
-            echo "❌ FAILED: /docs folder does not exist"
+            echo "FAILED: /docs folder does not exist"
             exit 1
           fi
-          echo "✅ PASSED: /docs folder exists"
+          echo "PASSED: /docs folder exists"
 
       - name: Validate /docs contains minimum 3 files
         run: |
@@ -36,26 +39,26 @@ jobs:
           echo "Found $file_count file(s) in /docs"
 
           if [ "$file_count" -lt 3 ]; then
-            echo "❌ FAILED: /docs contains only $file_count file(s), minimum 3 required"
-            find docs -type f -exec echo "  - {}" \;
+            echo "FAILED: /docs contains only $file_count file(s)"
+            find docs -type f
             exit 1
           fi
-          echo "✅ PASSED: /docs contains $file_count file(s) (minimum 3 required)"
-          find docs -type f -exec echo "  - {}" \;
+
+          echo "PASSED: /docs contains $file_count file(s)"
 
       - name: List /docs contents
         if: always()
         run: |
-          echo "📁 /docs folder contents:"
+          echo "docs folder contents:"
           ls -lah docs/
 
       - name: Validation Summary
         if: success()
-        run: echo "🎉 All repository structure validations passed!"
+        run: echo "All repository structure validations passed!"
 
-  build-projects:
+  build-and-test:
     runs-on: ubuntu-latest
-    name: Build API and MVC Projects
+    name: Build API and MVC and Run Tests
 
     steps:
       - name: Checkout repository
@@ -64,7 +67,7 @@ jobs:
       - name: Set up .NET 8
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: '8.0.x'
 
       - name: Restore API dependencies
         run: dotnet restore "RaceDay.API/RaceDay.API.csproj"
@@ -78,5 +81,15 @@ jobs:
       - name: Build MVC
         run: dotnet build "RaceDay,MVC/RaceDay.MVC.csproj" --configuration Release --no-restore
 
-      - name: Build Summary
-        run: echo "🎉 Both RaceDay API and MVC projects built successfully!"
+      - name: Restore test dependencies
+        run: dotnet restore "RaceDay.Api.Tests/RaceDay.Api.Tests.csproj"
+
+      - name: Build test project
+        run: dotnet build "RaceDay.Api.Tests/RaceDay.Api.Tests.csproj" --configuration Release --no-restore
+
+      - name: Run API tests
+        run: dotnet test "RaceDay.Api.Tests/RaceDay.Api.Tests.csproj" --configuration Release --no-build --no-restore
+
+      - name: Build and Test Summary
+        if: success()
+        run: echo "RaceDay API and MVC builds succeeded, and all API tests passed!"
