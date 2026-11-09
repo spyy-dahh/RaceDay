@@ -174,7 +174,7 @@ namespace RaceDay.Api.Controllers
             });
         }
 
-        [Authorize(Roles = "Participant")]
+        [Authorize(Roles = "Participant,Organiser")]
         [HttpPost("profile/image")]
         public async Task<IActionResult> UploadProfileImage(IFormFile image)
         {

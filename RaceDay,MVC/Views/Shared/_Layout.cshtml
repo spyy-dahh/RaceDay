@@ -67,6 +67,7 @@
                                     Dashboard
                                 </a>
                             </li>
+
                         }
 
                         @if (userRole == "Participant")
@@ -77,6 +78,30 @@
                                    asp-action="Profile">
                                     My Profile(Participant)
                                 </a>
+
+                                                        <!-- Profile picture and username -->
+                        @if (userRole == "Participant" || userRole == "Organiser")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center gap-2"
+                                   asp-controller="@(userRole == "Participant" ? "Participant" : "Organiser")"
+                                   asp-action="Profile">
+
+                                    <img src="@(userRole == "Participant"
+                                        ? Url.Action("ProfileImage", "Participant")
+                                        : Url.Action("ProfileImage", "Organiser"))"
+                                         alt="Profile Picture"
+                                         class="rounded-circle border"
+                                         style="width: 38px; height: 38px; object-fit: cover;"
+                                         onerror="this.style.display='none';" />
+
+                                    <span class="fw-semibold">
+                                        @Context.Session.GetString("UserName")
+                                    </span>
+
+                                </a>
+                            </li>
+                        }
                             </li>
                         }
                         else if (userRole == "Organiser")
@@ -87,6 +112,30 @@
                                    asp-action="Profile">
                                     My Profile(Organiser)
                                 </a>
+
+                                                        <!-- Profile picture and username -->
+                        @if (userRole == "Participant" || userRole == "Organiser")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link d-flex align-items-center gap-2"
+                                   asp-controller="@(userRole == "Participant" ? "Participant" : "Organiser")"
+                                   asp-action="Profile">
+
+                                    <img src="@(userRole == "Participant"
+                                        ? Url.Action("ProfileImage", "Participant")
+                                        : Url.Action("ProfileImage", "Organiser"))"
+                                         alt="Profile Picture"
+                                         class="rounded-circle border"
+                                         style="width: 38px; height: 38px; object-fit: cover;"
+                                         onerror="this.style.display='none';" />
+
+                                    <span class="fw-semibold">
+                                        @Context.Session.GetString("UserName")
+                                    </span>
+
+                                </a>
+                            </li>
+                        }
                             </li>
                         }
 

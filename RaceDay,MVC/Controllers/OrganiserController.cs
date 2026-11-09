@@ -872,5 +872,166 @@ namespace RaceDay.MVC.Controllers
 
             return View(model);
         }
+
+        // Display the logged-in organiser's profile.
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            if (HttpContext.Session.GetString("UserRole") != "Organiser")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            string? token = HttpContext.Session.GetString("JWToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var client = _httpClientFactory.CreateClient("RaceDayAPI");
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            try
+            {
+                var response = await client.GetAsync("api/users/profile");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    TempData["ErrorMessage"] = "Could not load your profile.";
+                    return RedirectToAction("Index");
+                }
+
+                var profile = await response.Content
+                    .ReadFromJsonAsync<ProfileViewModel>();
+
+                if (profile == null)
+                {
+                    TempData["ErrorMessage"] = "Could not retrieve your profile.";
+                    return RedirectToAction("Index");
+                }
+
+                return View(profile);
+            }
+            catch (HttpRequestException)
+            {
+                TempData["ErrorMessage"] = "Unable to connect to the RaceDay API.";
+                return RedirectToAction("Index");
+            }
+        }
+
+        // Upload or replace the organiser's profile picture.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UploadProfileImage(IFormFile image)
+        {
+            if (HttpContext.Session.GetString("UserRole") != "Organiser")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            string? token = HttpContext.Session.GetString("JWToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            if (image == null || image.Length == 0)
+            {
+                TempData["ErrorMessage"] = "Please select an image.";
+                return RedirectToAction("Profile");
+            }
+
+            var client = _httpClientFactory.CreateClient("RaceDayAPI");
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            using var formData = new MultipartFormDataContent();
+            using var imageStream = image.OpenReadStream();
+            using var imageContent = new StreamContent(imageStream);
+
+            imageContent.Headers.ContentType =
+                new System.Net.Http.Headers.MediaTypeHeaderValue(
+                    string.IsNullOrEmpty(image.ContentType)
+                        ? "application/octet-stream"
+                        : image.ContentType);
+
+            formData.Add(imageContent, "image", image.FileName);
+
+            try
+            {
+                var response = await client.PostAsync(
+                    "api/users/profile/image", formData);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    TempData["ErrorMessage"] =
+                        "Could not upload your profile picture. Please check the image and try again.";
+
+                    return RedirectToAction("Profile");
+                }
+
+                TempData["SuccessMessage"] =
+                    "Profile picture uploaded successfully!";
+
+                return RedirectToAction("Profile");
+            }
+            catch (HttpRequestException)
+            {
+                TempData["ErrorMessage"] =
+                    "Unable to connect to the RaceDay API.";
+
+                return RedirectToAction("Profile");
+            }
+        }
+
+        // Retrieve the logged-in organiser's profile picture.
+        [HttpGet]
+        public async Task<IActionResult> ProfileImage()
+        {
+            if (HttpContext.Session.GetString("UserRole") != "Organiser")
+            {
+                return Unauthorized();
+            }
+
+            string? token = HttpContext.Session.GetString("JWToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return Unauthorized();
+            }
+
+            var client = _httpClientFactory.CreateClient("RaceDayAPI");
+
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            try
+            {
+                var response = await client.GetAsync("api/users/profile/image");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+
+                byte[] imageBytes =
+                    await response.Content.ReadAsByteArrayAsync();
+
+                string contentType =
+                    response.Content.Headers.ContentType?.MediaType
+                    ?? "application/octet-stream";
+
+                return File(imageBytes, contentType);
+            }
+            catch (HttpRequestException)
+            {
+                return NotFound();
+            }
+        }
     }
 }
