@@ -110,6 +110,37 @@ namespace RaceDay.MVC.Controllers
             }
         }
 
+
+        // Retrieve an event banner image through the API.
+        public async Task<IActionResult> EventImage(int id)
+        {
+            var client = _httpClientFactory.CreateClient("RaceDayAPI");
+
+            try
+            {
+                var response = await client.GetAsync($"api/events/{id}/image");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return NotFound();
+                }
+
+                // Read the image returned by the API.
+                var imageBytes = await response.Content.ReadAsByteArrayAsync();
+
+                // Keep the original image content type (JPEG, PNG, etc.).
+                var contentType = response.Content.Headers.ContentType?.MediaType
+                    ?? "application/octet-stream";
+
+                return File(imageBytes, contentType);
+            }
+            catch (HttpRequestException)
+            {
+                return NotFound();
+            }
+        }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Enrol(int eventId, int categoryId)

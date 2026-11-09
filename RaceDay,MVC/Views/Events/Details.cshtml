@@ -9,7 +9,7 @@
     // Use the uploaded event image if one exists.
     if (!string.IsNullOrWhiteSpace(Model.Event.ImageName))
     {
-        imagePath = $"https://localhost:7252/api/events/{Model.Event.EventId}/image";
+        imagePath = Url.Action("EventImage", "Events", new { id = Model.Event.EventId })!;
     }
     else
     {

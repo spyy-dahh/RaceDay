@@ -98,7 +98,7 @@
 
                 if (!string.IsNullOrWhiteSpace(eventItem.ImageName))
                 {
-                    imagePath = $"https://localhost:7252/api/events/{eventItem.EventId}/image";
+                    imagePath = Url.Action("EventImage", "Events", new { id = eventItem.EventId })!;
                 }
                 else
                 {
