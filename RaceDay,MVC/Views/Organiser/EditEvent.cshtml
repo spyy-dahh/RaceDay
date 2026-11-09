@@ -19,7 +19,8 @@
                     <form asp-controller="Organiser"
                           asp-action="EditEvent"
                           asp-route-id="@ViewBag.EventId"
-                          method="post">
+                          method="post"
+                          enctype="multipart/form-data">
 
                         @Html.AntiForgeryToken()
 
@@ -90,6 +91,24 @@
                             </select>
                             <span asp-validation-for="EventType"
                                   class="text-danger"></span>
+                        </div>
+
+                        <!-- Optional replacement event banner -->
+                        <div class="mb-4">
+                            <label asp-for="ImageFile" class="form-label">
+                                Replace Event Banner (Optional)
+                            </label>
+
+                            <input asp-for="ImageFile"
+                                   type="file"
+                                   class="form-control"
+                                   accept=".jpg,.jpeg,.png,.webp" />
+
+                            <small class="text-muted">
+                                Select a new image to replace the existing banner.
+                                Leave empty to keep the current image.
+                                Maximum size: 5 MB.
+                            </small>
                         </div>
 
                         <div class="d-flex justify-content-between">

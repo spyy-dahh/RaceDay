@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace RaceDay.MVC.Models
 {
@@ -20,5 +21,8 @@ namespace RaceDay.MVC.Models
 
         [Required(ErrorMessage = "Please select an event type.")]
         public string EventType { get; set; } = string.Empty;
+
+        // Optional event banner image selected by the organiser
+        public IFormFile? ImageFile { get; set; }
     }
 }

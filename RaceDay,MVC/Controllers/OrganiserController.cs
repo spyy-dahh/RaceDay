@@ -1,7 +1,8 @@
-﻿using System.Net.Http.Headers;
-using System.Net.Http.Json;
+﻿using Microsoft.AspNetCore.Mvc;
 using RaceDay.MVC.Models;
-using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace RaceDay.MVC.Controllers
 {
@@ -41,7 +42,8 @@ namespace RaceDay.MVC.Controllers
             return View();
         }
 
-        // Send the new event to the API
+
+        // Send the new event and its optional image to the API
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateEvent(CreateEventViewModel model)
@@ -70,25 +72,81 @@ namespace RaceDay.MVC.Controllers
             var client = _httpClientFactory.CreateClient("RaceDayAPI");
 
             // Attach the JWT token to the request
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+            // Create an object containing only the event details
+            var eventData = new
+            {
+                model.EventName,
+                model.Description,
+                model.EventDate,
+                model.Location,
+                model.Distance,
+                model.EventType
+            };
 
             // Send the event details to the API
-            var response = await client.PostAsJsonAsync("api/events", model);
+            var response = await client.PostAsJsonAsync("api/events", eventData);
 
-            if (response.IsSuccessStatusCode)
+            if (!response.IsSuccessStatusCode)
             {
-                TempData["SuccessMessage"] = "Event created successfully!";
+                string errorMessage = await response.Content.ReadAsStringAsync();
 
-                return RedirectToAction("Index");
+                ModelState.AddModelError(string.Empty,
+                    "Could not create the event. " + errorMessage);
+
+                return View(model);
             }
 
-            // Read the error returned by the API
-            string errorMessage = await response.Content.ReadAsStringAsync();
+            // Read the newly created event ID from the API response
+            using var responseData = await response.Content.ReadFromJsonAsync<JsonDocument>();
 
-            ModelState.AddModelError(string.Empty,"Could not create the event. " + errorMessage);
+            if (responseData == null ||
+                !responseData.RootElement.TryGetProperty("eventID", out var eventIdElement))
+            {
+                TempData["ErrorMessage"] =
+                    "The event was created, but its ID could not be retrieved.";
 
-            return View(model);
+                return RedirectToAction("MyEvents");
+            }
+
+            int eventId = eventIdElement.GetInt32();
+
+            // Upload the image only if the organiser selected one
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
+            {
+                using var formData = new MultipartFormDataContent();
+
+                using var imageStream = model.ImageFile.OpenReadStream();
+
+                using var imageContent = new StreamContent(imageStream);
+
+                imageContent.Headers.ContentType =
+                    new MediaTypeHeaderValue(model.ImageFile.ContentType);
+
+                formData.Add(imageContent, "image", model.ImageFile.FileName);
+
+                // Send the image to the API
+                var imageResponse = await client.PostAsync(
+                    $"api/events/{eventId}/image", formData);
+
+                if (!imageResponse.IsSuccessStatusCode)
+                {
+                    string imageError = await imageResponse.Content.ReadAsStringAsync();
+
+                    TempData["ErrorMessage"] =
+                        "Your event was created, but the image upload failed. " + imageError;
+
+                    return RedirectToAction("MyEvents");
+                }
+            }
+
+            TempData["SuccessMessage"] = "Event created successfully!";
+
+            return RedirectToAction("MyEvents");
         }
+
 
         // Display events created by the logged-in organiser
         [HttpGet]
@@ -185,48 +243,98 @@ namespace RaceDay.MVC.Controllers
         }
 
         // Send updated event details to the API
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditEvent(int id, CreateEventViewModel model)
         {
+            // Only organisers can edit events.
             string? role = HttpContext.Session.GetString("UserRole");
 
             if (role != "Organiser")
-            {
                 return RedirectToAction("Login", "Account");
-            }
+
+            ViewBag.EventId = id;
 
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
+            // Retrieve the organiser's JWT token.
             string? token = HttpContext.Session.GetString("JWToken");
 
             if (string.IsNullOrEmpty(token))
-            {
                 return RedirectToAction("Login", "Account");
-            }
 
             var client = _httpClientFactory.CreateClient("RaceDayAPI");
 
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
 
-            // Update the event through the API
-            var response = await client.PutAsJsonAsync($"api/events/{id}", model);
-
-            if (response.IsSuccessStatusCode)
+            // Send only the event details to the API.
+            // ImageFile must be uploaded separately.
+            var eventData = new
             {
-                TempData["SuccessMessage"] = "Event updated successfully!";
-                return RedirectToAction("MyEvents");
+                model.EventName,
+                model.Description,
+                model.EventDate,
+                model.Location,
+                model.Distance,
+                model.EventType
+            };
+
+            var response = await client.PutAsJsonAsync(
+                $"api/events/{id}", eventData);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                string errorMessage = await response.Content.ReadAsStringAsync();
+
+                ModelState.AddModelError(
+                    string.Empty,
+                    "Could not update the event. " + errorMessage);
+
+                return View(model);
             }
 
-            string errorMessage = await response.Content.ReadAsStringAsync();
+            // If a replacement image was selected, upload it separately.
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
+            {
+                using var multipartContent = new MultipartFormDataContent();
 
-            ModelState.AddModelError(string.Empty,"Could not update the event. " + errorMessage);
+                using var imageStream = model.ImageFile.OpenReadStream();
 
-            return View(model);
+                using var imageContent = new StreamContent(imageStream);
+
+                imageContent.Headers.ContentType =
+                    new MediaTypeHeaderValue(model.ImageFile.ContentType);
+
+                multipartContent.Add(
+                    imageContent,
+                    "image",
+                    Path.GetFileName(model.ImageFile.FileName));
+
+                var imageResponse = await client.PostAsync(
+                    $"api/events/{id}/image",
+                    multipartContent);
+
+                if (!imageResponse.IsSuccessStatusCode)
+                {
+                    string imageError = await imageResponse.Content.ReadAsStringAsync();
+
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "The event details were updated, but the image could not be replaced. "
+                        + imageError);
+
+                    return View(model);
+                }
+            }
+
+            TempData["SuccessMessage"] = "Event updated successfully!";
+
+            return RedirectToAction("MyEvents");
         }
+
 
         // Delete an event
         [HttpPost]
