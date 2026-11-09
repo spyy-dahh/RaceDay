@@ -13,5 +13,8 @@ namespace RaceDay.Api.Models
         public required string Location { get; set; }
         public decimal Distance { get; set; }
         public required string EventType { get; set; }
+
+        // Stores the name of the event banner image in Azurite
+        public string? ImageName { get; set; }
     }
 }

@@ -112,8 +112,6 @@ namespace RaceDay.API.Data
                     .HasConstraintName("FK_Participant_User");
             });
 
-
-            // Event
             // Event
             modelBuilder.Entity<Event>(eventEntity =>
             {
@@ -155,6 +153,12 @@ namespace RaceDay.API.Data
                     .HasColumnName("eventType")
                     .HasMaxLength(20)
                     .IsRequired();
+
+                // Stores the name of the event banner image in Blob Storage
+                eventEntity.Property(e => e.ImageName)
+                    .HasColumnName("imageName")
+                    .HasMaxLength(255)
+                    .IsRequired(false);
 
                 eventEntity.ToTable("Event", eventTable =>
                 {

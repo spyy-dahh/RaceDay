@@ -57,6 +57,11 @@ namespace RaceDay.API.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("eventType");
 
+                    b.Property<string>("ImageName")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("imageName");
+
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasMaxLength(100)
