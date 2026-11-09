@@ -53,6 +53,11 @@ namespace RaceDay.API.Data
                     .HasMaxLength(255)
                     .IsRequired();
 
+                user.Property(user => user.ProfileImageName)
+                    .HasColumnName("profileImageName")
+                    .HasMaxLength(255)
+                    .IsRequired(false);
+
                 user.HasIndex(user => user.EmailAddress)
                     .IsUnique()
                     .HasDatabaseName("UQ_Users_EmailAddress");

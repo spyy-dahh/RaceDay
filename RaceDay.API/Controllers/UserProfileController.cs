@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RaceDay.Api.Models.DTOs;
 using RaceDay.API.Data;
+using RaceDay.API.Services;
 
 namespace RaceDay.Api.Controllers
 {
@@ -11,10 +12,12 @@ namespace RaceDay.Api.Controllers
     public class UserProfileController : ControllerBase
     {
         private readonly RaceDayDbContext _context;
+        private readonly BlobStorageService _blobStorageService;
 
-        public UserProfileController(RaceDayDbContext context)
+        public UserProfileController(RaceDayDbContext context, BlobStorageService blobStorageService)
         {
             _context = context;
+            _blobStorageService = blobStorageService;
         }
 
         [Authorize]
@@ -169,6 +172,128 @@ namespace RaceDay.Api.Controllers
             {
                 message = "Account deleted."
             });
+        }
+
+        [Authorize(Roles = "Participant")]
+        [HttpPost("profile/image")]
+        public async Task<IActionResult> UploadProfileImage(IFormFile image)
+        {
+            // Get the logged-in user's ID from the JWT token
+            var userIdClaim = User.FindFirst(
+                System.Security.Claims.ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new
+                {
+                    message = "User is not authenticated."
+                });
+            }
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            // Find the user
+            var user = await _context.Users
+                .FirstOrDefaultAsync(user => user.UserId == userId);
+
+            if (user == null)
+            {
+                return NotFound(new
+                {
+                    message = "User not found."
+                });
+            }
+
+            // Remember the previous profile image
+            string? oldImageName = user.ProfileImageName;
+
+            try
+            {
+                // Upload the new image to Blob Storage
+                string newImageName = await _blobStorageService.UploadImageAsync(image);
+
+                // Save the new image filename
+                user.ProfileImageName = newImageName;
+
+                await _context.SaveChangesAsync();
+
+                // Delete the previous image if one existed
+                if (!string.IsNullOrEmpty(oldImageName))
+                {
+                    await _blobStorageService.DeleteImageAsync(oldImageName);
+                }
+
+                return Ok(new
+                {
+                    message = "Profile picture uploaded successfully.",
+                    imageName = newImageName
+                });
+            }
+            catch (ArgumentException exception)
+            {
+                return BadRequest(new
+                {
+                    message = exception.Message
+                });
+            }
+        }
+
+        [Authorize]
+        [HttpGet("profile/image")]
+        public async Task<IActionResult> GetProfileImage()
+        {
+            // Get the logged-in user's ID from the JWT token
+            var userIdClaim = User.FindFirst(
+                System.Security.Claims.ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new
+                {
+                    message = "User is not authenticated."
+                });
+            }
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            // Find the user
+            var user = await _context.Users
+                .FirstOrDefaultAsync(user => user.UserId == userId);
+
+            if (user == null)
+            {
+                return NotFound(new
+                {
+                    message = "User not found."
+                });
+            }
+
+            // Check whether the user has uploaded a profile picture
+            if (string.IsNullOrEmpty(user.ProfileImageName))
+            {
+                return NotFound(new
+                {
+                    message = "No profile picture has been uploaded."
+                });
+            }
+
+            // Retrieve the picture from Blob Storage
+            var image = await _blobStorageService.GetImageAsync(
+                user.ProfileImageName);
+
+            if (image == null)
+            {
+                return NotFound(new
+                {
+                    message = "Profile picture not found."
+                });
+            }
+
+            // Return the image to the browser
+            return File(
+                image.Content,
+                image.Details.ContentType ?? "application/octet-stream"
+            );
         }
     }
 }

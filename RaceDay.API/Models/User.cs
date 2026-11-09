@@ -11,5 +11,6 @@ namespace RaceDay.Api.Models
         public required string EmailAddress { get; set; }
         public required string ContactNumber { get; set; }
         public required string Password { get; set; }
+        public string? ProfileImageName { get; set; }
     }
 }

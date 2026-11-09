@@ -1,0 +1,68 @@
+﻿@model RaceDay.MVC.Models.ProfileViewModel
+
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<div class="container mt-5 mb-5">
+
+    <div class="mb-4">
+        <h1 class="display-6 fw-bold">Edit Profile</h1>
+        <p class="text-muted">
+            Update your RaceDay contact information.
+        </p>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+
+            <form asp-controller="Participant"
+                  asp-action="EditProfile"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="UserName" class="form-label"></label>
+                    <input asp-for="UserName"
+                           class="form-control"
+                           readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="EmailAddress" class="form-label"></label>
+                    <input asp-for="EmailAddress"
+                           class="form-control"
+                           readonly />
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="ContactNumber" class="form-label"></label>
+                    <input asp-for="ContactNumber"
+                           class="form-control" />
+
+                    <span asp-validation-for="ContactNumber"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        Save Changes
+                    </button>
+
+                    <a asp-controller="Participant"
+                       asp-action="Profile"
+                       class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
