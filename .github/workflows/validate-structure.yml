@@ -1,16 +1,12 @@
-name: Validate Repository Structure
+name: RaceDay CI — Validate, Build and Test
 
 on:
   push:
     branches:
-      - master
-      - main
-      - develop
+      - '**'
   pull_request:
     branches:
-      - master
-      - main
-      - develop
+      - '**'
 
 jobs:
   validate-structure:
