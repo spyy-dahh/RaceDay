@@ -65,6 +65,9 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Check .NET SDK version
+        run: dotnet --version
+      
       - name: Restore API dependencies
         run: dotnet restore "RaceDay.API/RaceDay.API.csproj"
 
